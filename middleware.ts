@@ -15,6 +15,7 @@ export default function middleware(req: NextRequest) {
   
   // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
   const hostname = (req.headers.get("host") || "demo.localhost:3000").replace(":" + url.port, '')
+  const ROOT_DOMAIN = process.env.ROOT_DOMAIN?.replace(":" + url.port, '')
 
   /*  You have to replace ".vercel.pub" with your own domain if you deploy this example under your domain.
       You can also use wildcard subdomains on .vercel.app links that are associated with your Vercel team slug
@@ -23,8 +24,7 @@ export default function middleware(req: NextRequest) {
   const currentHost =
     process.env.NODE_ENV === "production" && process.env.VERCEL === "1"
       ? hostname
-          .replace(`.${process.env.ROOT_DOMAIN}`, "")
-          .replace(`.platformize.vercel.app`, "")
+          .replace(`.${ROOT_DOMAIN}`, "")
       : hostname.replace(`.localhost`, "");
 
   // rewrites for app pages
@@ -43,7 +43,7 @@ export default function middleware(req: NextRequest) {
   }
 
   // rewrite root application to `/home` folder
-  if (hostname === process.env.ROOT_DOMAIN || hostname === "platformize.vercel.app") {
+  if (hostname ===  ROOT_DOMAIN) {
     url.pathname = `/home${url.pathname}`;
     return NextResponse.rewrite(url);
   }
