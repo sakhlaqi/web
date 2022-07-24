@@ -1,3 +1,42 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": [ 
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@next/next/recommended",
+    "plugin:storybook/recommended"
+  ],
+  "env": {
+    "es6": true,
+    "browser": true,
+    "jest": true,
+    "node": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "mdx/code-blocks": true,
+    "mdx/language-mapper": {}
+  },
+  "overrides": [
+    {
+      // or whatever matches stories specified in .storybook/main.js
+      "files": ["*.stories.@(ts|tsx|js|jsx|mjs|cjs)"],
+      "rules": {
+        // example of overriding a rule
+        "storybook/hierarchy-separator": "error",
+        // example of disabling a rule
+        "storybook/default-exports": "off",
+      }
+    },
+    {
+      "files": [".tsx", ".ts"],
+      "extends": "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    },
+    {
+      "files": ["*.md", "*.mdx"],
+      "extends": "plugin:mdx/recommended"
+    }
+  ]
 }

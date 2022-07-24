@@ -10,7 +10,9 @@
     "predev": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -45,6 +47,17 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.9",
+    "@next/eslint-plugin-next": "^11.1.2",
+    "@storybook/addon-a11y": "^6.5.9",
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-interactions": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/builder-webpack5": "^6.5.9",
+    "@storybook/manager-webpack5": "^6.5.9",
+    "@storybook/react": "^6.5.9",
+    "@storybook/testing-library": "^0.0.13",
     "@tailwindcss/forms": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.0",
@@ -53,12 +66,14 @@
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.11",
     "autoprefixer": "^10.4.2",
-    "eslint": "8.11.0",
+    "babel-loader": "^8.2.5",
+    "eslint": "^8.11.0",
     "eslint-config-next": "^12.1.7-canary.48",
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "prisma": "^3.8.1",
     "tailwindcss": "^3.0.15",
-    "typescript": "^4.6.2"
+    "typescript": "^4.6.2",
+    "webpack": "^5.73.0"
   }
 }
