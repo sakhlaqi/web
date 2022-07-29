@@ -20,8 +20,9 @@ export default function Layout({ siteId, children }: LayoutProps) {
   const logo = "/favicon.ico";
   const router = useRouter();
   const sitePage = router.pathname.startsWith("/app/site/[id]");
+  const customPage = router.pathname.startsWith("/app/page/[id]");
   const postPage = router.pathname.startsWith("/app/post/[id]");
-  const rootPage = !sitePage && !postPage;
+  const rootPage = !sitePage && !customPage && !postPage;
   const tab = rootPage
     ? router.asPath.split("/")[1]
     : router.asPath.split("/")[3];
@@ -139,7 +140,16 @@ export default function Layout({ siteId, children }: LayoutProps) {
                 <Link href={`/site/${router.query.id}`} passHref>
                   <a
                     className={`border-b-2 ${
-                      !tab ? "border-black" : "border-transparent"
+                      (!tab || tab == "pages") ? "border-black" : "border-transparent"
+                    } py-3`}
+                  >
+                    Pages
+                  </a>
+                </Link>
+                <Link href={`/site/${router.query.id}/posts`} passHref>
+                  <a
+                    className={`border-b-2 ${
+                      tab == "posts" ? "border-black" : "border-transparent"
                     } py-3`}
                   >
                     Posts
@@ -168,11 +178,51 @@ export default function Layout({ siteId, children }: LayoutProps) {
             </div>
           </div>
         )}
+        {customPage && (
+          <div className="absolute left-0 right-0 top-16 font-cal border-b bg-white border-gray-200">
+            <div className="flex justify-between items-center space-x-16 max-w-screen-xl mx-auto px-10 sm:px-20">
+              {siteId ? (
+                <Link href={`/site/${siteId}/pages`} passHref>
+                  <a>
+                    ←<p className="md:inline-block ml-3 hidden">All Pages</p>
+                  </a>
+                </Link>
+              ) : (
+                <div>
+                  {" "}
+                  ←<p className="md:inline-block ml-3 hidden">All Pages</p>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center space-x-10 md:space-x-16">
+                <Link href={`/page/${router.query.id}`} passHref>
+                  <a
+                    className={`border-b-2 ${
+                      !tab ? "border-black" : "border-transparent"
+                    } py-3`}
+                  >
+                    Editor
+                  </a>
+                </Link>
+                <Link href={`/page/${router.query.id}/settings`} passHref>
+                  <a
+                    className={`border-b-2 ${
+                      tab == "settings" ? "border-black" : "border-transparent"
+                    } py-3`}
+                  >
+                    Settings
+                  </a>
+                </Link>
+              </div>
+              <div />
+            </div>
+          </div>
+        )}
         {postPage && (
           <div className="absolute left-0 right-0 top-16 font-cal border-b bg-white border-gray-200">
             <div className="flex justify-between items-center space-x-16 max-w-screen-xl mx-auto px-10 sm:px-20">
               {siteId ? (
-                <Link href={`/site/${siteId}`} passHref>
+                <Link href={`/site/${siteId}/posts`} passHref>
                   <a>
                     ←<p className="md:inline-block ml-3 hidden">All Posts</p>
                   </a>
