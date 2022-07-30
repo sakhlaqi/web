@@ -1,3 +1,5 @@
+const { is } = require('date-fns/locale')
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -15,4 +17,19 @@ module.exports = {
   },
   reactStrictMode: true,
   swcMinify: false, // Required to fix: https://nextjs.org/docs/messages/failed-loading-swc
-};
+  // webpack: (config) => {
+  //   config.resolve.fallback = { fs: false, path: false, stream: false, constants: false };
+  //   return config;
+  // },
+
+  webpack: (
+    config, { isServer }
+  ) => {
+    if ( !isServer) {
+       // Fixes npm packages that depend on `fs` module
+      config.resolve.fallback = { fs: false, path: false };
+    }
+    // Important: return the modified config
+    return config
+  },
+}

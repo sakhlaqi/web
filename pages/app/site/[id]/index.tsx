@@ -81,20 +81,6 @@ export default function SiteIndex() {
               data.pages.map((page) => (
                 <Link href={`/page/${page.id}`} key={page.id}>
                   <div className="flex flex-col md:flex-row md:h-60 rounded-lg overflow-hidden border border-gray-200">
-                    <div className="relative w-full h-60 md:h-auto md:w-1/3 md:flex-none">
-                      {page.image ? (
-                        <BlurImage
-                          alt={page.title ?? "Unknown Thumbnail"}
-                          layout="fill"
-                          objectFit="cover"
-                          src={page.image}
-                        />
-                      ) : (
-                        <div className="absolute flex items-center justify-center w-full h-full bg-gray-100 text-gray-500 text-4xl">
-                          ?
-                        </div>
-                      )}
-                    </div>
                     <div className="relative p-10">
                       <h2 className="font-cal text-3xl">{page.title}</h2>
                       <p className="text-base my-5 line-clamp-3">
