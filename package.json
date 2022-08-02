@@ -71,7 +71,6 @@
     "eslint": "^8.11.0",
     "eslint-config-next": "^12.1.7-canary.48",
     "grapesjs": "^0.19.5",
-    "grapesjs-react": "^4.0.1-alpha",
     "grapesjs-tailwind": "^1.0.7",
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
