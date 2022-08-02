@@ -54,6 +54,11 @@ export default function GrapesjsReact(props:any) {
                 block.attributes.attributes.class += ' _cat_' + block.attributes.category
             }
         })
+        // Close all the categories on start.
+        setTimeout(() => {
+          const categories: any = _editor.BlockManager.getCategories();
+          categories.each((category : any) => { category.set('open', false); });
+        }, 500);
       }
     }, [children, editor, id, onInit]);
 
