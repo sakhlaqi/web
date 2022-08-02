@@ -12,8 +12,6 @@ import LoadingDots from "@/components/app/loading-dots";
 import { fetcher } from "@/lib/fetcher";
 import { HttpMethod } from "@/types";
 
-import type { ChangeEvent } from "react";
-
 import type { WithSitePage } from "@/types";
 
 interface PageData {
@@ -181,13 +179,11 @@ export default function Page() {
   return (
     <>
       <Layout siteId={page?.site?.id}>
-        <div className="max-w-screen-xl mx-auto px-10 sm:px-20 mt-10 mb-16">
-          
-          
+        <div className="mx-auto">
+          <div className="md:w-1-3"></div>
           <Builder></Builder>
-
         </div>
-        <footer className="h-20 z-5 fixed bottom-0 inset-x-0 border-solid border-t border-gray-500 bg-white">
+        {/* <footer className="h-20 z-5 fixed bottom-0 inset-x-0 border-solid border-t border-gray-500 bg-white">
           <div className="max-w-screen-xl mx-auto px-10 sm:px-20 h-full flex justify-between items-center">
             <div className="text-sm">
               <strong>
@@ -214,7 +210,7 @@ export default function Page() {
               {publishing ? <LoadingDots /> : "Publish  →"}
             </button>
           </div>
-        </footer>
+        </footer> */}
       </Layout>
     </>
   );

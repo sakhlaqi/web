@@ -9,3 +9,31 @@
     -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
 }
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+}
+
+/* Make blocks full width */
+.gjs-block:not(._cat_Basic, ._cat_Extra, ._cat_Forms) {
+  padding: 0 !important;
+  width: 100% !important;
+  min-height: auto !important;
+  background-color: #fff;
+}
+
+/* Fit icons properly */
+.gjs-block svg {
+  width: 100%;
+  height: auto;
+}
+
+.gjs-one-bg {
+  background-color: #333 !important;
+}
+
+.gjs-two-color {
+  color: #fff !important;
+}
