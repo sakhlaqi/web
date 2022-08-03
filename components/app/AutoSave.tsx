@@ -1,17 +1,10 @@
-import TextareaAutosize from "react-textarea-autosize";
-import toast from "react-hot-toast";
-import useSWR, { mutate } from "swr";
-import { useDebounce } from "use-debounce";
-import { useRouter } from "next/router";
+
 import { useState, useEffect, useCallback } from "react";
-
-import Layout from "@/components/app/Layout";
-import Loader from "@/components/app/Loader";
-import Builder from "@/components/app/Builder";
-import LoadingDots from "@/components/app/loading-dots";
-import { fetcher } from "@/lib/fetcher";
+import { useDebounce } from "use-debounce";
+import { mutate } from "swr";
 import { HttpMethod } from "@/types";
-
+import LoadingDots from "@/components/app/loading-dots";
+import toast from "react-hot-toast";
 import type { WithSitePage } from "@/types";
 
 interface PageData {
@@ -20,35 +13,12 @@ interface PageData {
   content: string;
 }
 
-export default function Page() {
-  const router = useRouter();
+interface AutoSaveProps {
+  page? : WithSitePage
+}
 
-  // TODO: Undefined check redirects to error
-  const { id: pageId } = router.query;
-
-  const { data: page, isValidating } = useSWR<WithSitePage>(
-    router.isReady && `/api/page?pageId=${pageId}`,
-    fetcher,
-    {
-      dedupingInterval: 1000,
-      onError: () => router.push("/"),
-      revalidateOnFocus: false,
-    }
-  );
-
-  const [savedState, setSavedState] = useState(
-    page
-      ? `Last saved at ${Intl.DateTimeFormat("en", { month: "short" }).format(
-          new Date(page.updatedAt)
-        )} ${Intl.DateTimeFormat("en", { day: "2-digit" }).format(
-          new Date(page.updatedAt)
-        )} ${Intl.DateTimeFormat("en", {
-          hour: "numeric",
-          minute: "numeric",
-        }).format(new Date(page.updatedAt))}`
-      : "Saving changes..."
-  );
-
+export default function AutoSave (props: AutoSaveProps) {
+  const [page, setPage] = useState<WithSitePage|undefined>(props.page);
   const [data, setData] = useState<PageData>({
     title: "",
     description: "",
@@ -64,7 +34,18 @@ export default function Page() {
       });
   }, [page]);
 
-  const [debouncedData] = useDebounce(data, 1000);
+  const [savedState, setSavedState] = useState(
+    page
+      ? `Last saved at ${Intl.DateTimeFormat("en", { month: "short" }).format(
+          new Date(page.updatedAt)
+        )} ${Intl.DateTimeFormat("en", { day: "2-digit" }).format(
+          new Date(page.updatedAt)
+        )} ${Intl.DateTimeFormat("en", {
+          hour: "numeric",
+          minute: "numeric",
+        }).format(new Date(page.updatedAt))}`
+      : "Saving changes..."
+  );
 
   const saveChanges = useCallback(
     async (data: PageData) => {
@@ -77,7 +58,7 @@ export default function Page() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: pageId,
+            id: page?.id,
             title: data.title,
             description: data.description,
             content: data.content,
@@ -104,9 +85,10 @@ export default function Page() {
         console.error(error);
       }
     },
-    [pageId]
+    [page?.id]
   );
 
+  const [debouncedData] = useDebounce(data, 1000);
   useEffect(() => {
     if (debouncedData.title) saveChanges(debouncedData);
   }, [debouncedData, saveChanges]);
@@ -137,7 +119,6 @@ export default function Page() {
 
   async function publish() {
     setPublishing(true);
-
     try {
       const response = await fetch(`/api/page`, {
         method: HttpMethod.PUT,
@@ -145,7 +126,7 @@ export default function Page() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: pageId,
+          id: page?.id,
           title: data.title,
           description: data.description,
           content: data.content,
@@ -157,10 +138,7 @@ export default function Page() {
       });
 
       if (response.ok) {
-        mutate(`/api/page?pageId=${pageId}`);
-        router.push(
-          `http://${page?.site?.subdomain}.${process.env.ROOT_DOMAIN}/${page?.slug}`
-        );
+        // mutate(`/api/page?pageId=${page?.id}`);
       }
     } catch (error) {
       console.error(error);
@@ -168,49 +146,42 @@ export default function Page() {
       setPublishing(false);
     }
   }
-
-  if (isValidating)
     return (
-      <Layout>
-        <Loader />
-      </Layout>
-    );
+      // 
+      // mx-auto px-10 sm:px-20 h-full flex justify-between items-center
+      <>
+        <div className="font-cal flex items-center space-x-2 text-gray-700 pl-5 sm:hover:text-black sm:hover:bg-white">
+          {/* <div className="text-sm transition-all ease-in-out duration-150">
+            <strong>
+              <p>{page?.published ? "Published" : "Draft"}</p>
+            </strong>
+            <p>{savedState}</p>
+          </div> */}
+          <button
+            onClick={async () => {
+              await publish();
+            }}
+            title={
+              disabled
+                ? "Page must have a title, description, and content to be published."
+                : "Publish"
+            }
+            disabled={disabled}
+            className={`${
+              disabled
+                ? "cursor-not-allowed bg-gray-300 border-gray-300"
+                : "bg-green-700 hover:bg-green-600 hover:text-white border-black hover:bg-green-700"
+            } inline-flex items-center px-4 py-2 rounded-md shadow-sm text-medium font-thin text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+          >
+            {!publishing && page?.published &&
+              <svg className="-ml-1 mr-2 h-5 w-5" x-description="Heroicon name: solid/check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+            }
 
-  return (
-    <>
-      <Layout siteId={page?.site?.id}>
-        <div className="mx-auto">
-          <Builder page={page} data={debouncedData}></Builder>
+            {publishing ? <LoadingDots /> : "Publish"}
+          </button>
         </div>
-        {/* <footer className="h-20 z-5 fixed bottom-0 inset-x-0 border-solid border-t border-gray-500 bg-white">
-          <div className="max-w-screen-xl mx-auto px-10 sm:px-20 h-full flex justify-between items-center">
-            <div className="text-sm">
-              <strong>
-                <p>{page?.published ? "Published" : "Draft"}</p>
-              </strong>
-              <p>{savedState}</p>
-            </div>
-            <button
-              onClick={async () => {
-                await publish();
-              }}
-              title={
-                disabled
-                  ? "Page must have a title, description, and content to be published."
-                  : "Publish"
-              }
-              disabled={disabled}
-              className={`${
-                disabled
-                  ? "cursor-not-allowed bg-gray-300 border-gray-300"
-                  : "bg-black hover:bg-white hover:text-black border-black"
-              } mx-2 w-32 h-12 text-lg text-white border-2 focus:outline-none transition-all ease-in-out duration-150`}
-            >
-              {publishing ? <LoadingDots /> : "Publish  →"}
-            </button>
-          </div>
-        </footer> */}
-      </Layout>
-    </>
-  );
+      </>
+    )
 }
