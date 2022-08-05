@@ -7,7 +7,6 @@ import Loader from "@/components/app/Loader";
 import Builder from "@/components/app/Builder";
 import BlurImage from "@/components/BlurImage";
 import { fetcher } from "@/lib/fetcher";
-
 import type { WithSitePage } from "@/types";
 
 export default function Page() {
