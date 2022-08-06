@@ -6,14 +6,20 @@ import React from "react";
 import { signOut } from "next-auth/react";
 import Loader from "./Loader";
 import useRequireAuth from "../../lib/useRequireAuth";
+import {State} from '../../store';
+import {useSelector, useStore} from 'react-redux';
 
 import type { WithChildren } from "@/types";
+import type { WithSitePage } from "@/types";
 
 interface LayoutProps extends WithChildren {
   siteId?: string;
 }
 
 export default function Layout({ siteId, children }: LayoutProps) {
+
+  const { page } = useSelector<State, State>((state) => state);
+
   const title = "Platforms on Vercel";
   const description =
     "Create a fullstack application with multi-tenancy and custom domains support using Next.js, Prisma, and PostgreSQL";

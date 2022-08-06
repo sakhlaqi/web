@@ -1,14 +1,15 @@
+import React, {FC} from 'react';
 import PlausibleProvider from "next-plausible";
 import { SessionProvider } from "next-auth/react";
+import type { AppProps } from "next/app";
+import {wrapper} from '../store';
 
 import "@/styles/globals.css";
 
-import type { AppProps } from "next/app";
-
-export default function App({
-  Component,
+const WrappedApp: FC<AppProps> = ({
+  Component, 
   pageProps: { session, ...pageProps },
-}: AppProps) {
+}) => {
   return (
     <PlausibleProvider domain={process.env.ROOT_DOMAIN||""}>
       <SessionProvider session={session}>
@@ -16,4 +17,6 @@ export default function App({
       </SessionProvider>
     </PlausibleProvider>
   );
-}
+};
+
+export default wrapper.withRedux(WrappedApp);

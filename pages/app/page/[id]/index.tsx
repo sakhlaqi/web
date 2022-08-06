@@ -12,8 +12,12 @@ import { fetcher } from "@/lib/fetcher";
 import { HttpMethod } from "@/types";
 
 import type { ChangeEvent } from "react";
-
 import type { WithSitePage } from "@/types";
+
+import {useSelector, useStore} from 'react-redux';
+
+// import {fetchSubject, selectSubject, wrapper} from '../../../../store';
+import {wrapper, State} from '../../../../store';
 
 interface PageData {
   title: string;
@@ -52,21 +56,34 @@ Ordered lists look like:
 
             `;
 
-export default function Page() {
+export default function Page(props:any) {
+
+  const { page } = useSelector<State, State>(state => state);
+
+  console[page ? 'info' : 'warn']('page: ', page);
+
+  if (!page) {
+      return (
+        <Layout>
+          <Loader />
+        </Layout>
+    )
+  }
+
   const router = useRouter();
 
   // TODO: Undefined check redirects to error
-  const { id: pageId } = router.query;
+  // const { id: pageId } = router.query;
 
-  const { data: page, isValidating } = useSWR<WithSitePage>(
-    router.isReady && `/api/page?pageId=${pageId}`,
-    fetcher,
-    {
-      dedupingInterval: 1000,
-      onError: () => router.push("/"),
-      revalidateOnFocus: false,
-    }
-  );
+  // const { data: page, isValidating } = useSWR<WithSitePage>(
+  //   router.isReady && `/api/page?pageId=${pageId}`,
+  //   fetcher,
+  //   {
+  //     dedupingInterval: 1000,
+  //     onError: () => router.push("/"),
+  //     revalidateOnFocus: false,
+  //   }
+  // ); cxz
 
   const [savedState, setSavedState] = useState(
     page
@@ -109,7 +126,7 @@ export default function Page() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: pageId,
+            id: page?.id,
             title: data.title,
             description: data.description,
             content: data.content,
@@ -136,7 +153,7 @@ export default function Page() {
         console.error(error);
       }
     },
-    [pageId]
+    [page.id]
   );
 
   useEffect(() => {
@@ -177,7 +194,7 @@ export default function Page() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: pageId,
+          id: page.id,
           title: data.title,
           description: data.description,
           content: data.content,
@@ -187,9 +204,8 @@ export default function Page() {
           slug: page?.slug,
         }),
       });
-
       if (response.ok) {
-        mutate(`/api/page?pageId=${pageId}`);
+        mutate(`/api/page?pageId=${page.id}`);
         router.push(
           `http://${page?.site?.subdomain}.${process.env.ROOT_DOMAIN}/${page?.slug}`
         );
@@ -200,13 +216,6 @@ export default function Page() {
       setPublishing(false);
     }
   }
-
-  if (isValidating)
-    return (
-      <Layout>
-        <Loader />
-      </Layout>
-    );
 
   return (
     <>
@@ -290,3 +299,22 @@ export default function Page() {
     </>
   );
 }
+
+export const getServerSideProps = wrapper.getServerSideProps(store => async ({req, res, params}) => {
+  //@ts-ignore
+  const {id} = params;
+  const page = await prisma?.page.findFirst({
+    where: {
+      id: id
+    },
+    include: {
+      site: true,
+    }
+  });
+  store.dispatch({type: 'PAGE', payload: JSON.parse(JSON.stringify(page))});
+  return {
+      props: {
+          id,
+      }
+  }
+})
