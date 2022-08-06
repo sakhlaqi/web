@@ -1,60 +1,9 @@
-import TextareaAutosize from "react-textarea-autosize";
-import toast from "react-hot-toast";
-import useSWR, { mutate } from "swr";
-import { useDebounce } from "use-debounce";
-import { useRouter } from "next/router";
-import { useState, useEffect, useCallback } from "react";
-
 import Layout from "@/components/app/Layout";
 import Loader from "@/components/app/Loader";
-import LoadingDots from "@/components/app/loading-dots";
-import { fetcher } from "@/lib/fetcher";
-import { HttpMethod } from "@/types";
-
-import type { ChangeEvent } from "react";
-import type { WithSitePage } from "@/types";
-
-import {useSelector, useStore} from 'react-redux';
-
-// import {fetchSubject, selectSubject, wrapper} from '../../../../store';
+import Builder from "@/components/app/Builder";
+import BlurImage from "@/components/BlurImage";
+import {useSelector} from 'react-redux';
 import {wrapper, State} from '../../../../store';
-
-interface PageData {
-  title: string;
-  description: string;
-  content: string;
-}
-
-const CONTENT_PLACEHOLDER = `Write some content. Markdown supported:
-
-# A H1 header
-
-## A H2 header
-
-Fun fact: You embed tweets by pasting the tweet URL in a new line:
-
-https://twitter.com/nextjs/status/1468044361082580995
-
-Paragraphs are separated by a blank line.
-
-2nd paragraph. *Italic*, and **bold**. Itemized lists look like:
-
-  * this one
-  * that one
-  * the other one
-
-Ordered lists look like:
-
-  1. first item
-  2. second item
-  3. third item
-
-> Block quotes are written like so.
->
-> They can span multiple paragraphs,
-> if you like.
-
-            `;
 
 export default function Page(props:any) {
 
@@ -70,234 +19,29 @@ export default function Page(props:any) {
     )
   }
 
-  const router = useRouter();
-
-  // TODO: Undefined check redirects to error
-  // const { id: pageId } = router.query;
-
-  // const { data: page, isValidating } = useSWR<WithSitePage>(
-  //   router.isReady && `/api/page?pageId=${pageId}`,
-  //   fetcher,
-  //   {
-  //     dedupingInterval: 1000,
-  //     onError: () => router.push("/"),
-  //     revalidateOnFocus: false,
-  //   }
-  // ); cxz
-
-  const [savedState, setSavedState] = useState(
-    page
-      ? `Last saved at ${Intl.DateTimeFormat("en", { month: "short" }).format(
-          new Date(page.updatedAt)
-        )} ${Intl.DateTimeFormat("en", { day: "2-digit" }).format(
-          new Date(page.updatedAt)
-        )} ${Intl.DateTimeFormat("en", {
-          hour: "numeric",
-          minute: "numeric",
-        }).format(new Date(page.updatedAt))}`
-      : "Saving changes..."
-  );
-
-  const [data, setData] = useState<PageData>({
-    title: "",
-    description: "",
-    content: "",
-  });
-
-  useEffect(() => {
-    if (page)
-      setData({
-        title: page.title ?? "",
-        description: page.description ?? "",
-        content: page.content ?? "",
-      });
-  }, [page]);
-
-  const [debouncedData] = useDebounce(data, 1000);
-
-  const saveChanges = useCallback(
-    async (data: PageData) => {
-      setSavedState("Saving changes...");
-
-      try {
-        const response = await fetch("/api/page", {
-          method: HttpMethod.PUT,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: page?.id,
-            title: data.title,
-            description: data.description,
-            content: data.content,
-          }),
-        });
-
-        if (response.ok) {
-          const responseData = await response.json();
-          setSavedState(
-            `Last save ${Intl.DateTimeFormat("en", { month: "short" }).format(
-              new Date(responseData.updatedAt)
-            )} ${Intl.DateTimeFormat("en", { day: "2-digit" }).format(
-              new Date(responseData.updatedAt)
-            )} at ${Intl.DateTimeFormat("en", {
-              hour: "numeric",
-              minute: "numeric",
-            }).format(new Date(responseData.updatedAt))}`
-          );
-        } else {
-          setSavedState("Failed to save.");
-          toast.error("Failed to save");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [page.id]
-  );
-
-  useEffect(() => {
-    if (debouncedData.title) saveChanges(debouncedData);
-  }, [debouncedData, saveChanges]);
-
-  const [publishing, setPublishing] = useState(false);
-  const [disabled, setDisabled] = useState(true);
-
-  useEffect(() => {
-    if (data.title && data.description && data.content && !publishing)
-      setDisabled(false);
-    else setDisabled(true);
-  }, [publishing, data]);
-
-  useEffect(() => {
-    function clickedSave(e: KeyboardEvent) {
-      let charCode = String.fromCharCode(e.which).toLowerCase();
-
-      if ((e.ctrlKey || e.metaKey) && charCode === "s") {
-        e.preventDefault();
-        saveChanges(data);
-      }
-    }
-
-    window.addEventListener("keydown", clickedSave);
-
-    return () => window.removeEventListener("keydown", clickedSave);
-  }, [data, saveChanges]);
-
-  async function publish() {
-    setPublishing(true);
-
-    try {
-      const response = await fetch(`/api/page`, {
-        method: HttpMethod.PUT,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: page.id,
-          title: data.title,
-          description: data.description,
-          content: data.content,
-          published: true,
-          subdomain: page?.site?.subdomain,
-          customDomain: page?.site?.customDomain,
-          slug: page?.slug,
-        }),
-      });
-      if (response.ok) {
-        mutate(`/api/page?pageId=${page.id}`);
-        router.push(
-          `http://${page?.site?.subdomain}.${process.env.ROOT_DOMAIN}/${page?.slug}`
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setPublishing(false);
-    }
-  }
-
   return (
     <>
       <Layout siteId={page?.site?.id}>
-        <div className="max-w-screen-xl mx-auto px-10 sm:px-20 mt-10 mb-16">
-          <TextareaAutosize
-            name="title"
-            onInput={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setData({
-                ...data,
-                title: (e.target as HTMLTextAreaElement).value,
-              })
-            }
-            className="w-full px-2 py-4 text-gray-800 placeholder-gray-400 mt-6 text-5xl font-cal resize-none border-none focus:outline-none focus:ring-0"
-            placeholder="Untitled Page"
-            value={data.title}
-          />
-          <TextareaAutosize
-            name="description"
-            onInput={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setData({
-                ...data,
-                description: (e.target as HTMLTextAreaElement).value,
-              })
-            }
-            className="w-full px-2 py-3 text-gray-800 placeholder-gray-400 text-xl mb-3 resize-none border-none focus:outline-none focus:ring-0"
-            placeholder="No description provided. Click to edit."
-            value={data.description}
-          />
-
-          <div className="relative mb-6">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="w-full border-t border-gray-300" />
+        <div className="mx-auto">
+          {page?.id ? (
+              <Builder></Builder>
+          ) : (
+            <div className="flex flex-col justify-center items-center py-20">
+              <BlurImage
+                src="/empty-state.png"
+                alt="No Pages"
+                width={613}
+                height={420}
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAA6ZJREFUWEe1VwFuGzEMk2///+8uydmDSFGWfdduKLAUQYqsiyiKpJQ2xhj2t4f/RR82RreO18FX/xlm+oDWzKw1a63Z4c+Dz3YcX1ZoPwLQh/VBIF48O2he/78BiO57R3ECMIDAw7s3L27WvGswcCQT+IeHx78x4HR7Ye9cIygM5Oc+MnBgDD8HkDPvNgJAHz27XwRUAfj8G4tTBxDIjYPvGfAuUfSJfo7AH/4SE5gaQOE5Av/9iYWvAWzFvWvQXwVYDQTxFRF68dTCBLODeAYQImPnon7VgBxQOYUDQL1e5wj4njNCq2ocNwD4YPicxSm8+bsYcP7r/GW/BFE0IFBiBH8D0zQrADhTCKzM3YtfVQMhSrIf03fq/adSro4XRmhPPsO93av5R8lWpTgLx/Ny788k9No1ATOAQnjoOoTITFiL+3sg4epXhiE9ziIofrE4fycAx0uwMX11X4pA/bJfWHGCCOojvdr780EvSrU6dy98BYj5PgEU82X2q4gAZBo+da8RvN7vGwBR78UnEyHGGJX4l6Co8Ek7KQ8rSgfwqawaGjhfr0UDolydJ4gtimU/iK/ZLXS0BaclqQFuS7oQ//d8nWAUqzWiFtRj7hdGMEeh+U8DEkB0rgWkFIxVLBC5rmVBx/H7PJMBbLlQPQqX4hqLRFgZyC4lvtwBcwQ1J9h9iHEBgJjdCl8XnQAxcg0jhAY/5L7/vahccCzJmP6XBR3IIwOl8w8KcxRax0rBnwEIIYqB83whVNnYzACOYNeAr+Gwoe6Q5QKanSuEMoA2K4YKXYTFBQqgEGHqwIFEQtYg0gqGBm4CLIvoONYIzihu1pADxQV7BogJ2pNOSRZ4hH3jgpIDhQFYMc44JmHcdtqCsl3aT4GkpRRC1DGIHCjXD0Wo4gyouqaVAXi9PheDdVnDg/MP9e9xXBnQIYoUbKH64oJcSCUN5/lu1rrzGgCYA3sWEIgvJn/d7wGMwEdRL+ESRIslyyrObYhVuIyAAOoikhjzQsptyHsg7agVjHEcdvyqdyHZURbkDsldHCBuDJTusZ5xK8ZVHBtJQty3Ye1+2Q2xkKDD5ZuRg4gRLG74diXrC0lxQ45gzYX9MLkD8He6zSNEEby7YLOibDVvv1p4i+UaSDcG4sxzFpaLSJfRPoJylueyKafYPgJ9T6g74fEsH85CLbpdRvp2LPekosNqa+FtDPE3ukqfvxdoDBuIeq4td2Gc+uxsjeB0Q1nRPEx4lPwBA2anSbfNT08AAAAASUVORK5CYII="
+              />
+              <p className="text-2xl font-cal text-gray-600">Page was not found!</p>
             </div>
+          )}
           </div>
-          <TextareaAutosize
-            name="content"
-            onInput={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setData({
-                ...data,
-                content: (e.target as HTMLTextAreaElement).value,
-              })
-            }
-            className="w-full px-2 py-3 text-gray-800 placeholder-gray-400 text-lg mb-5 resize-none border-none focus:outline-none focus:ring-0"
-            placeholder={CONTENT_PLACEHOLDER}
-            value={data.content}
-          />
-        </div>
-        <footer className="h-20 z-5 fixed bottom-0 inset-x-0 border-solid border-t border-gray-500 bg-white">
-          <div className="max-w-screen-xl mx-auto px-10 sm:px-20 h-full flex justify-between items-center">
-            <div className="text-sm">
-              <strong>
-                <p>{page?.published ? "Published" : "Draft"}</p>
-              </strong>
-              <p>{savedState}</p>
-            </div>
-            <button
-              onClick={async () => {
-                await publish();
-              }}
-              title={
-                disabled
-                  ? "Page must have a title, description, and content to be published."
-                  : "Publish"
-              }
-              disabled={disabled}
-              className={`${
-                disabled
-                  ? "cursor-not-allowed bg-gray-300 border-gray-300"
-                  : "bg-black hover:bg-white hover:text-black border-black"
-              } mx-2 w-32 h-12 text-lg text-white border-2 focus:outline-none transition-all ease-in-out duration-150`}
-            >
-              {publishing ? <LoadingDots /> : "Publish  →"}
-            </button>
-          </div>
-        </footer>
       </Layout>
     </>
-  );
+  )
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(store => async ({req, res, params}) => {

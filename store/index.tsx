@@ -2,7 +2,7 @@
 
 import {createStore, AnyAction, Store, applyMiddleware } from 'redux';
 import {createWrapper, Context, HYDRATE} from 'next-redux-wrapper';
-import { Action, ThunkAction } from '@reduxjs/toolkit';
+// import { Action, ThunkAction } from '@reduxjs/toolkit';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 
