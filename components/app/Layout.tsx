@@ -19,7 +19,7 @@ interface LayoutProps extends WithChildren {
 
 export default function Layout({ siteId, children }: LayoutProps) {
 
-  const { page } = useSelector<State, State>((state) => state);
+  // const { page, post } = useSelector<State, State>((state) => state);
   const title = "Platforms on Vercel";
   const description =
     "Create a fullstack application with multi-tenancy and custom domains support using Next.js, Prisma, and PostgreSQL";
@@ -94,7 +94,7 @@ export default function Layout({ siteId, children }: LayoutProps) {
               </button>
             </div>
             
-            {customPage && page && <AutoSave page={page}></AutoSave> }
+            {(customPage || postPage) && <AutoSave></AutoSave> }
             
           </div>
         </div>

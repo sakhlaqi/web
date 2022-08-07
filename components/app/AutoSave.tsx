@@ -1,77 +1,64 @@
 
 import { useState, useEffect, useCallback } from "react";
-import { mutate } from "swr";
 import { HttpMethod } from "@/types";
-import LoadingDots from "@/components/app/loading-dots";
 import toast from "react-hot-toast";
 import type { WithSitePage } from "@/types";
 import CheckIcon from "../../public/icons/check.svg";
 import SaveIcon from "../../public/icons/save.svg";
 
 import {State} from '../../store';
-import {useSelector, useStore} from 'react-redux';
+import {useSelector} from 'react-redux';
+import { useRouter } from "next/router";
 
-interface PageData {
-  title: string;
-  description: string;
-  content: string;
-}
-
+import type { WithSitePost } from "@/types";
 interface AutoSaveProps {
-  page? : WithSitePage
+  page? : WithSitePage,
+  post? : WithSitePost
 }
 
 export default function AutoSave (props: AutoSaveProps) {
 
-  const { page } = useSelector<State, State>((state) => state);
+  const router = useRouter();
 
-  const [data, setData] = useState<PageData>({
-    title: "",
-    description: "",
-    content: "",
-  });
+  const _key = router.asPath.split("/")[1];
+  const _type = _key == 'page' ? _key : 'post';
+  const _page = useSelector<State, State[typeof _type]>(state => state[_type]);
 
-  useEffect(() => {
-    if (page)
-      setData({
-        title: page.title ?? "",
-        description: page.description ?? "",
-        content: page.content ?? "",
-      });
-  }, [page]);
+  // console.log(`AutoSave`, _type, _page);
 
   const [savedState, setSavedState] = useState(
-    page
+    _page
       ? `Last saved at ${Intl.DateTimeFormat("en", { month: "short" }).format(
-          new Date(page.updatedAt)
+          new Date(_page.updatedAt)
         )} ${Intl.DateTimeFormat("en", { day: "2-digit" }).format(
-          new Date(page.updatedAt)
+          new Date(_page.updatedAt)
         )} ${Intl.DateTimeFormat("en", {
           hour: "numeric",
           minute: "numeric",
-        }).format(new Date(page.updatedAt))}`
+        }).format(new Date(_page.updatedAt))}`
       : ""
   );
 
   const [saveState, setSaveState] = useState(
-    page ? `Save` : "Saving..."
+    _page ? `Save` : "Saving..."
   );
 
   const saveChanges = useCallback(
-    async (data: PageData) => {
+    async (data:typeof _page) => {
       setSaveState("Saving...");
 
       try {
-        const response = await fetch("/api/page", {
+        console.log("Saving...", data);
+        const response = await fetch("/api/" + _type, {
           method: HttpMethod.PUT,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: page?.id,
-            title: data.title,
-            description: data.description,
-            content: data.content,
+            id: data?.id,
+            title: data?.title,
+            description: data?.description,
+            content: data?.content,
           }),
         });
 
@@ -96,13 +83,11 @@ export default function AutoSave (props: AutoSaveProps) {
         console.error(error);
       }
     },
-    [page?.id]
+    [_page?.id]
   );
 
   const triggerSave = () => {
-    
-    
-    saveChanges(data)
+    saveChanges(_page)
   }
 
   //uncomment to enable Auto Save
@@ -115,10 +100,10 @@ export default function AutoSave (props: AutoSaveProps) {
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
-    if (data.title && data.description && data.content && !publishing)
+    if (_page?.title && _page.description && _page.content && !publishing)
       setDisabled(false);
     else setDisabled(true);
-  }, [publishing, data]);
+  }, [publishing, _page]);
 
   useEffect(() => {
     function clickedSave(e: KeyboardEvent) {
@@ -126,31 +111,31 @@ export default function AutoSave (props: AutoSaveProps) {
 
       if ((e.ctrlKey || e.metaKey) && charCode === "s") {
         e.preventDefault();
-        saveChanges(data);
+        saveChanges(_page);
       }
     }
     window.addEventListener("keydown", clickedSave);
 
     return () => window.removeEventListener("keydown", clickedSave);
-  }, [data, saveChanges]);
+  }, [_page, saveChanges]);
 
-  async function publish() {
+  async function publish(data:typeof _page) {
     setPublishing(true);
     try {
-      const response = await fetch(`/api/page`, {
+      const response = await fetch(`/api/` + _type, {
         method: HttpMethod.PUT,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: page?.id,
-          title: data.title,
-          description: data.description,
-          content: data.content,
+          id: data?.id,
+          title: data?.title,
+          description: data?.description,
+          content: data?.content,
           published: true,
-          subdomain: page?.site?.subdomain,
-          customDomain: page?.site?.customDomain,
-          slug: page?.slug,
+          subdomain: data?.site?.subdomain,
+          customDomain: data?.site?.customDomain,
+          slug: data?.slug,
         }),
       });
 
@@ -187,7 +172,7 @@ export default function AutoSave (props: AutoSaveProps) {
 
           <button
             onClick={async () => {
-              await publish();
+              await publish(_page);
             }}
             title={
               disabled
@@ -201,7 +186,7 @@ export default function AutoSave (props: AutoSaveProps) {
                 : "bg-green-700 hover:bg-green-600 hover:text-white border-black"
             } inline-flex items-center px-4 py-2 rounded-md shadow-sm text-medium font-thin text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
           >
-            {!publishing && page?.published &&
+            {!publishing && _page?.published &&
               <CheckIcon className="-ml-1 mr-2 h-5 w-5" />
             }
             {publishing ? "Publishing..." : "Publish"}
