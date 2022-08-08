@@ -8,7 +8,6 @@ import {wrapper, State} from '../../../../store';
 export default function Page(props:any) {
 
   const { page } = useSelector<State, State>(state => state);
-  // console[page ? 'info' : 'warn']('page: ', page);
 
   if (!page) {
       return (

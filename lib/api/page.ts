@@ -238,7 +238,7 @@ export async function updatePage(
     if (subdomain) {
       // revalidate for subdomain
       await revalidate(
-        `https://${subdomain}.${process.env.ROOT_DOMAIN}`, // hostname to be revalidated
+        `http://${subdomain}.${process.env.ROOT_DOMAIN}`, // hostname to be revalidated
         subdomain, // siteId
         slug // slugname for the page
       );
@@ -246,7 +246,7 @@ export async function updatePage(
     if (customDomain)
       // revalidate for custom domain
       await revalidate(
-        `https://${customDomain}`, // hostname to be revalidated
+        `http://${customDomain}`, // hostname to be revalidated
         customDomain, // siteId
         slug // slugname for the page
       );

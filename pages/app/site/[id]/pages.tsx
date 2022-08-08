@@ -23,7 +23,7 @@ export default function SitePages() {
   const { id: siteId } = router.query;
 
   const { data } = useSWR<SitePageData>(
-    siteId && `/api/page?siteId=${siteId}&published=true`,
+    siteId && `/api/page?siteId=${siteId}`,
     fetcher,
     {
       onSuccess: (data) => !data?.site && router.push("/"),
