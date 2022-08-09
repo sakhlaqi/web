@@ -20,11 +20,12 @@ export default function Page(props:any) {
   return (
     <>
       <Layout siteId={page?.site?.id}>
-        <div className="mx-auto">
           {page?.id ? (
+            <div className="mx-auto absolute top-28 bottom-0 left-0 right-0">
               <Builder></Builder>
+            </div>
           ) : (
-            <div className="flex flex-col justify-center items-center py-20">
+            <div className="mx-auto flex flex-col justify-center items-center py-20">
               <BlurImage
                 src="/empty-state.png"
                 alt="No Pages"
@@ -36,7 +37,6 @@ export default function Page(props:any) {
               <p className="text-2xl font-cal text-gray-600">Page was not found!</p>
             </div>
           )}
-          </div>
       </Layout>
     </>
   )

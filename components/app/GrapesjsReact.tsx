@@ -33,6 +33,9 @@ export default function GrapesjsReact(props:any) {
             // Get the content for the canvas directly from the element
             // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
             fromElement: true,
+            height: '100%',
+            /** Show the wrapper component in the final code, eg. in editor.getHtml() */
+            exportWrapper: false,
             // Disable the storage manager for the moment
             // storageManager: false,
             // Avoid any default panel

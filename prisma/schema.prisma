@@ -116,3 +116,47 @@ model Page {
 
   @@unique([id, siteId], name: "page_site_constraint")
 }
+
+model aea7c72_8e50_57fb_af0d_45122876e2fe_20220809031112_vrepl {
+  id            String   @id
+  title         String?  @db.Text
+  description   String?  @db.Text
+  content       String?  @db.LongText
+  slug          String
+  image         String?  @db.Text
+  imageBlurhash String?  @db.LongText
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  published     Boolean  @default(false)
+  siteId        String?
+
+  @@unique([id, siteId], map: "Post_id_siteId_key")
+  @@map("_0aea7c72_8e50_57fb_af0d_45122876e2fe_20220809031112_vrepl")
+}
+
+model edff398e_70f6_5a22_ad28_95e3a7a85a65_20220809031104_vrepl {
+  id          String   @id
+  title       String?  @db.Text
+  description String?  @db.Text
+  content     String?  @db.LongText
+  slug        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  published   Boolean  @default(false)
+  siteId      String?
+
+  @@unique([id, siteId], map: "Page_id_siteId_key")
+  @@map("_edff398e_70f6_5a22_ad28_95e3a7a85a65_20220809031104_vrepl")
+}
+
+model vt_HOLD_ce7f74c70a475a5d8de804656e4a6c43_20220810031103 {
+  id            Int     @id @default(autoincrement())
+  name          String?
+  description   String? @db.Text
+  domainCount   Int?
+  url           String?
+  image         String? @db.Text
+  imageBlurhash String? @db.LongText
+
+  @@map("_vt_HOLD_ce7f74c70a475a5d8de804656e4a6c43_20220810031103")
+}

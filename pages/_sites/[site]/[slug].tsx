@@ -35,24 +35,24 @@ interface PathProps extends ParsedUrlQuery {
   slug: string;
 }
 
+import type { WithSitePage } from "@/types";
 interface PageProps {
-  stringifiedData: string;
-  stringifiedAdjacentPage: string;
+  data: WithSitePage;
 }
 
+
 export default function Page({
-  stringifiedAdjacentPage,
-  stringifiedData,
+  data,
 }: PageProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
 
-  const data = JSON.parse(stringifiedData) as _SiteSlugData & {
-    mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
-  };
-  const adjacentPages = stringifiedAdjacentPage && JSON.parse(
-    stringifiedAdjacentPage
-  ) as Array<AdjacentPage>;
+  // const data = JSON.parse(stringifiedData) as _SiteSlugData & {
+  //   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
+  // };
+  // const adjacentPages = JSON.parse(
+  //   stringifiedAdjacentPage
+  // ) as Array<AdjacentPage>;
 
   const meta = {
     description: data.description,
@@ -61,79 +61,10 @@ export default function Page({
     ogUrl: `https://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${data.slug}`,
     title: data.title,
   } as Meta;
-
+  console.log(data);
   return (
     <Layout meta={meta} subdomain={data.site?.subdomain ?? undefined}>
-      <div className="flex flex-col justify-center items-center">
-        <div className="text-center w-full md:w-7/12 m-auto">
-          <p className="text-sm md:text-base font-light text-gray-500 w-10/12 m-auto my-5">
-            <Date dateString={data.createdAt.toString()} />
-          </p>
-          <h1 className="font-bold text-3xl font-cal md:text-6xl mb-10 text-gray-800">
-            {data.title}
-          </h1>
-          <p className="text-md md:text-lg text-gray-600 w-10/12 m-auto">
-            {data.description}
-          </p>
-        </div>
-        <a
-          // if you are using Github OAuth, you can get rid of the Twitter option
-          href={
-            data.site?.user?.username
-              ? `https://twitter.com/${data.site.user.username}`
-              : `https://github.com/${data.site?.user?.gh_username}`
-          }
-          rel="noreferrer"
-          target="_blank"
-        >
-          <div className="my-8">
-            <div className="relative w-8 h-8 md:w-12 md:h-12 rounded-full overflow-hidden inline-block align-middle">
-              {data.site?.user?.image ? (
-                <BlurImage
-                  alt={data.site?.user?.name ?? "User Avatar"}
-                  height={80}
-                  src={data.site.user.image}
-                  width={80}
-                />
-              ) : (
-                <div className="absolute flex items-center justify-center w-full h-full bg-gray-100 text-gray-500 text-4xl select-none">
-                  ?
-                </div>
-              )}
-            </div>
-            <div className="inline-block text-md md:text-lg align-middle ml-3">
-              by <span className="font-semibold">{data.site?.user?.name}</span>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <article className="w-11/12 sm:w-3/4 m-auto prose prose-md sm:prose-lg">
-        <MDXRemote {...data.mdxSource} components={components} />
-      </article>
-{/* 
-      {adjacentPages.length > 0 && (
-        <div className="relative mt-10 sm:mt-20 mb-20">
-          <div
-            className="absolute inset-0 flex items-center"
-            aria-hidden="true"
-          >
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="px-2 bg-white text-sm text-gray-500">
-              Continue Reading
-            </span>
-          </div>
-        </div>
-      )}
-      {adjacentPages && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-8 mx-5 lg:mx-12 2xl:mx-auto mb-20 max-w-screen-xl">
-          {adjacentPages.map((data, index) => (
-            <BlogCard key={index} data={data} />
-          ))}
-        </div>
-      )} */}
+      {data.content || ''}
     </Layout>
   );
 }
@@ -144,7 +75,7 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
       published: true,
       // you can remove this if you want to generate all sites at build time
       site: {
-        subdomain: "demo",
+        subdomain: "salman",
       },
     },
     select: {
@@ -193,6 +124,7 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
 export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
   params,
 }) => {
+  console.log('params',params);
   if (!params) throw new Error("No path parameters found");
 
   const { site, slug } = params;
@@ -228,55 +160,10 @@ export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
 
   if (!data) return { notFound: true, revalidate: 10 };
 
-  const [mdxSource, adjacentPages] = await Promise.all([
-    getMdxSource(data.content!),
-    prisma.page.findMany({
-      where: {
-        site: {
-          ...filter,
-        },
-        published: true,
-        NOT: {
-          id: data.id,
-        },
-      },
-      select: {
-        slug: true,
-        title: true,
-        createdAt: true,
-        description: true,
-      },
-    }),
-  ]);
-
   return {
     props: {
-      stringifiedData: JSON.stringify({
-        ...data,
-        mdxSource,
-      }),
-      stringifiedAdjacentPage: JSON.stringify(adjacentPages),
+      data: JSON.parse(JSON.stringify(data)),
     },
     revalidate: 3600,
   };
 };
-
-async function getMdxSource(pageContents: string) {
-  // Use remark plugins to convert markdown into HTML string
-  const processedContent = await remark()
-    // Native remark plugin that parses markdown into MDX
-    .use(remarkMdx)
-    // Replaces tweets with static <Tweet /> component
-    .use(replaceTweets)
-    // Replaces examples with <Example /> component (only for demo.vercel.pub)
-    .use(() => replaceExamples(prisma))
-    .process(pageContents);
-
-  // Convert converted html to string format
-  const contentHtml = String(processedContent);
-
-  // Serialize the content string into MDX
-  const mdxSource = await serialize(contentHtml);
-
-  return mdxSource;
-}

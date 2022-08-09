@@ -25,8 +25,6 @@ export default function AutoSave (props: AutoSaveProps) {
   const data = useSelector<State, State[typeof _type]>(state => state[_type]);
   const { editor } = useSelector<State, State>(state => state);
 
-  console.log('editor',editor);
-
   const [savedState, setSavedState] = useState(
     data
       ? `Last saved at ${Intl.DateTimeFormat("en", { month: "short" }).format(
@@ -45,9 +43,8 @@ export default function AutoSave (props: AutoSaveProps) {
   );
 
   const saveChanges = useCallback(
-    async (_data:typeof data) => {
+    async (_data:typeof data, _editor:typeof editor) => {
       setSaveState("Saving...");
-      console.log("Saving...", editor, editor && editor?.getHtml() );
       try {
         const response = await fetch("/api/" + _type, {
           method: HttpMethod.PUT,
@@ -58,8 +55,8 @@ export default function AutoSave (props: AutoSaveProps) {
             id: _data?.id,
             title: _data?.title,
             description: _data?.description,
-            data: editor && JSON.stringify(editor?.getProjectData()) || _data?.data,
-            content: editor && editor?.getHtml() || _data?.content,
+            data: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
+            content: _editor && _editor?.getHtml() || _data?.content,
           }),
         });
 
@@ -88,7 +85,7 @@ export default function AutoSave (props: AutoSaveProps) {
   );
 
   const triggerSave = () => {
-    saveChanges(data)
+    saveChanges(data, editor)
   }
 
   //uncomment to enable Auto Save
@@ -112,7 +109,7 @@ export default function AutoSave (props: AutoSaveProps) {
 
       if ((e.ctrlKey || e.metaKey) && charCode === "s") {
         e.preventDefault();
-        saveChanges(data);
+        saveChanges(data, editor);
       }
     }
     window.addEventListener("keydown", clickedSave);
@@ -120,7 +117,7 @@ export default function AutoSave (props: AutoSaveProps) {
     return () => window.removeEventListener("keydown", clickedSave);
   }, [data, saveChanges]);
 
-  async function publish(_data:typeof data) {
+  async function publish(_data:typeof data, _editor:typeof editor) {
     setPublishing(true);
     try {
       const response = await fetch(`/api/` + _type, {
@@ -153,9 +150,6 @@ export default function AutoSave (props: AutoSaveProps) {
     return (
       <>
         <div className="font-cal flex items-center space-x-2 text-gray-700 pl-5 sm:hover:text-black sm:hover:bg-white">
-          {data?.publishedAt}
-          --
-          {data?.updatedAt}
           <button
             onClick={async () => {
               await triggerSave();
@@ -177,7 +171,7 @@ export default function AutoSave (props: AutoSaveProps) {
 
           <button
             onClick={async () => {
-              await publish(data);
+              await publish(data, editor);
             }}
             title={
               disabled
