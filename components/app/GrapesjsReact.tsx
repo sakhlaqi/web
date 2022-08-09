@@ -27,7 +27,6 @@ export default function GrapesjsReact(props:any) {
     React.useEffect(function () {
       var selector = "#" + id;
       if (!editor) {
-        console.log('initializing editor');
         var _editor = GrapesJS.init({
             // Indicate where to init the editor. You can also pass an HTMLElement
             container: selector,
@@ -49,8 +48,8 @@ export default function GrapesjsReact(props:any) {
             storageManager: {
               autosave: true,
               autoload: true,
-              onStore: content => ({id:page?.id, content:JSON.stringify(content)}),
-              onLoad: result => result.content && JSON.parse(result.content) || {},
+              onStore: data => ({id:page?.id, data:JSON.stringify(data)}),
+              onLoad: result => result.data && JSON.parse(result.data) || {},
               type: 'local',
               options: {
                 local: {
@@ -59,14 +58,14 @@ export default function GrapesjsReact(props:any) {
                 remote: {
                   urlStore: '/api/page',
                   urlLoad: '/api/page?pageId=' + page?.id,
-                  fetchOptions: opts => (opts.method === 'POST' ?  { method: 'PUT' } : {}),
+                  fetchOptions: opts => ({ method: 'PUT' }),
                 }
               }
             }
-            // storageManager: { type: 'inline' },
         });
-        setEditor(_editor);
         
+        setEditor(_editor);
+
         //Adding _cat_... class to predefined blocks
         const blocks = _editor.BlockManager.getAll();
         blocks.map( (block:any) => {
@@ -75,10 +74,12 @@ export default function GrapesjsReact(props:any) {
             }
         })
         // Close all the categories on start.
-        setTimeout(() => {
-          const categories: any = _editor.BlockManager.getCategories();
-          categories.each((category : any) => { category.set('open', false); });
-        }, 500);
+        // setTimeout(() => {
+        //   const categories: any = _editor.BlockManager.getCategories();
+        //   categories.each((category : any) => { category.set('open', false); });
+        // }, 500);
+
+        _editor.loadProjectData( page?.data && JSON.parse(page?.data ) || {});
 
         dispatch({type: 'EDITOR', payload: _editor});
 

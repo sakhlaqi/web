@@ -7,7 +7,7 @@ import {useSelector, useDispatch} from 'react-redux';
 export default function Builder (props:any) {
   const { page } = useSelector<State, State>(state => state);
   const onEditorInit = (editor:GrapesJS.Editor) => {
-    editor.loadProjectData( page?.content && JSON.parse(page?.content ) || {});
+    editor.loadProjectData( page?.data && JSON.parse(page?.data ) || {});
   };
   return (
     <>

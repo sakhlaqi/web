@@ -9,13 +9,11 @@ import SaveIcon from "../../public/icons/save.svg";
 import {State} from '../../store';
 import {useSelector} from 'react-redux';
 import { useRouter } from "next/router";
-import GrapesJS from 'grapesjs';
 
 import type { WithSitePost } from "@/types";
 interface AutoSaveProps {
   page? : WithSitePage,
   post? : WithSitePost,
-  editor? : GrapesJS.Editor
 }
 
 export default function AutoSave (props: AutoSaveProps) {
@@ -26,6 +24,8 @@ export default function AutoSave (props: AutoSaveProps) {
   const _type = _key == 'page' ? _key : 'post';
   const data = useSelector<State, State[typeof _type]>(state => state[_type]);
   const { editor } = useSelector<State, State>(state => state);
+
+  console.log('editor',editor);
 
   const [savedState, setSavedState] = useState(
     data
@@ -47,7 +47,7 @@ export default function AutoSave (props: AutoSaveProps) {
   const saveChanges = useCallback(
     async (_data:typeof data) => {
       setSaveState("Saving...");
-
+      console.log("Saving...", editor, editor && editor?.getHtml() );
       try {
         const response = await fetch("/api/" + _type, {
           method: HttpMethod.PUT,
@@ -58,7 +58,8 @@ export default function AutoSave (props: AutoSaveProps) {
             id: _data?.id,
             title: _data?.title,
             description: _data?.description,
-            content: editor && JSON.stringify(editor?.getProjectData()) || _data?.content,
+            data: editor && JSON.stringify(editor?.getProjectData()) || _data?.data,
+            content: editor && editor?.getHtml() || _data?.content,
           }),
         });
 
@@ -132,6 +133,7 @@ export default function AutoSave (props: AutoSaveProps) {
           title: _data?.title,
           description: _data?.description,
           content: editor && JSON.stringify(editor?.getProjectData()) || _data?.content,
+          data: editor && JSON.stringify(editor?.getProjectData()) || _data?.data,
           published: true,
           subdomain: _data?.site?.subdomain,
           customDomain: _data?.site?.customDomain,
@@ -151,6 +153,9 @@ export default function AutoSave (props: AutoSaveProps) {
     return (
       <>
         <div className="font-cal flex items-center space-x-2 text-gray-700 pl-5 sm:hover:text-black sm:hover:bg-white">
+          {data?.publishedAt}
+          --
+          {data?.updatedAt}
           <button
             onClick={async () => {
               await triggerSave();

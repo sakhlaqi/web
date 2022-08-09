@@ -50,7 +50,7 @@ export default function Page({
   const data = JSON.parse(stringifiedData) as _SiteSlugData & {
     mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
   };
-  const adjacentPages = JSON.parse(
+  const adjacentPages = stringifiedAdjacentPage && JSON.parse(
     stringifiedAdjacentPage
   ) as Array<AdjacentPage>;
 

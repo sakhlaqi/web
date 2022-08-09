@@ -69,12 +69,14 @@ model Post {
   title         String?  @db.Text
   description   String?  @db.Text
   content       String?  @db.LongText
+  data          String?  @db.LongText
   slug          String   @default(cuid())
   image         String?  @db.Text
   imageBlurhash String?  @db.LongText
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   published     Boolean  @default(false)
+  publishedAt   DateTime @default(now())
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId        String?
 
@@ -98,26 +100,18 @@ model Site {
   pages         Page[]
 }
 
-model Example {
-  id            Int     @id @default(autoincrement())
-  name          String?
-  description   String? @db.Text
-  domainCount   Int?
-  url           String?
-  image         String? @db.Text
-  imageBlurhash String? @db.LongText
-}
-
 model Page {
   id          String   @id @default(cuid())
   title       String?  @db.Text
   description String?  @db.Text
-  content     String?  @db.LongText
   slug        String   @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   published   Boolean  @default(false)
+  publishedAt DateTime @default(now())
   siteId      String?
+  data        String?  @db.LongText
+  content     String?  @db.LongText
   site        Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([id, siteId], name: "page_site_constraint")

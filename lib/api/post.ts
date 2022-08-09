@@ -217,10 +217,12 @@ export async function updatePost(
     title,
     description,
     content,
+    data,
     slug,
     image,
     imageBlurhash,
     published,
+    publishedAt,
     subdomain,
     customDomain,
   } = req.body;
@@ -234,10 +236,12 @@ export async function updatePost(
         title,
         description,
         content,
+        data,
         slug,
         image,
         imageBlurhash,
         published,
+        publishedAt,
       },
     });
     if (subdomain) {

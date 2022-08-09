@@ -106,10 +106,6 @@ export default function Index({ stringifiedData }: IndexProps) {
 export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
   const [subdomains, customDomains] = await Promise.all([
     prisma.site.findMany({
-      // you can remove this if you want to generate all sites at build time
-      where: {
-        subdomain: "demo",
-      },
       select: {
         subdomain: true,
       },
@@ -118,9 +114,7 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
       where: {
         NOT: {
           customDomain: null,
-        },
-        // you can remove this if you want to generate all sites at build time
-        customDomain: "platformize.co",
+        }
       },
       select: {
         customDomain: true,
