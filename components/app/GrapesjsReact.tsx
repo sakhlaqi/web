@@ -36,6 +36,7 @@ export default function GrapesjsReact(props:any) {
             height: '100%',
             /** Show the wrapper component in the final code, eg. in editor.getHtml() */
             exportWrapper: false,
+            wrapperIsBody: false,
             // Disable the storage manager for the moment
             // storageManager: false,
             // Avoid any default panel

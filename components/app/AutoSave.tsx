@@ -45,19 +45,28 @@ export default function AutoSave (props: AutoSaveProps) {
   const saveChanges = useCallback(
     async (_data:typeof data, _editor:typeof editor) => {
       setSaveState("Saving...");
+
+      const body = {
+        id: _data?.id,
+        title: _data?.title,
+        description: _data?.description,
+        data: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
+        css: _editor && _editor?.getCss() || '',
+        content: _editor && _editor?.getHtml() || _data?.content,
+        twcss: ''
+      }
+      _editor && _editor.runCommand('get-tailwindCss', {
+        callback: (_twcss:string) => { body.twcss = _twcss; },
+      });
+
       try {
         const response = await fetch("/api/" + _type, {
           method: HttpMethod.PUT,
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            id: _data?.id,
-            title: _data?.title,
-            description: _data?.description,
-            data: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
-            content: _editor && _editor?.getHtml() || _data?.content,
-          }),
+          body:  
+          JSON.stringify(body),
         });
 
         if (response.ok) {

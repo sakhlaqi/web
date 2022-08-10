@@ -40,7 +40,6 @@ interface PageProps {
   data: WithSitePage;
 }
 
-
 export default function Page({
   data,
 }: PageProps) {
