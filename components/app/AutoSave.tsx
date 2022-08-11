@@ -50,15 +50,12 @@ export default function AutoSave (props: AutoSaveProps) {
         id: _data?.id,
         title: _data?.title,
         description: _data?.description,
-        data: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
-        css: _editor && _editor?.getCss() || '',
-        content: _editor && _editor?.getHtml() || _data?.content,
-        twcss: ''
+        previewData: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.previewData,
+        preview: _editor && _editor?.getHtml() || _data?.preview,
       }
-      _editor && _editor.runCommand('get-tailwindCss', {
-        callback: (_twcss:string) => { body.twcss = _twcss; },
-      });
-
+      // _editor && _editor.runCommand('get-tailwindCss', {
+      //   callback: (_twcss:string) => { body.twcss = _twcss; },
+      // });
       try {
         const response = await fetch("/api/" + _type, {
           method: HttpMethod.PUT,
@@ -129,22 +126,25 @@ export default function AutoSave (props: AutoSaveProps) {
   async function publish(_data:typeof data, _editor:typeof editor) {
     setPublishing(true);
     try {
+      const body = {
+        id: _data?.id,
+        title: _data?.title,
+        description: _data?.description,
+        data: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
+        content: _editor && _editor?.getHtml() || _data?.content,
+        previewData: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
+        preview: _editor && _editor?.getHtml() || _data?.content,
+        published: true,
+        subdomain: _data?.site?.subdomain,
+        customDomain: _data?.site?.customDomain,
+        slug: _data?.slug,
+      }
       const response = await fetch(`/api/` + _type, {
         method: HttpMethod.PUT,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          id: _data?.id,
-          title: _data?.title,
-          description: _data?.description,
-          content: editor && JSON.stringify(editor?.getProjectData()) || _data?.content,
-          data: editor && JSON.stringify(editor?.getProjectData()) || _data?.data,
-          published: true,
-          subdomain: _data?.site?.subdomain,
-          customDomain: _data?.site?.customDomain,
-          slug: _data?.slug,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {

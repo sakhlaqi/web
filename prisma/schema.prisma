@@ -87,11 +87,11 @@ model Post {
   description   String?  @db.Text
   content       String?  @db.LongText
   data          String?  @db.LongText
+  preview       String?  @db.LongText  
+  previewData   String?  @db.LongText
   slug          String   @default(cuid())
   image         String?  @db.Text
   imageBlurhash String?  @db.LongText
-  css           String?  @db.LongText
-  twcss         String?  @db.LongText
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   published     Boolean  @default(false)
@@ -107,10 +107,10 @@ model Page {
   title       String?  @db.Text
   description String?  @db.Text
   slug        String   @default(cuid())
-  data        String?  @db.LongText
   content     String?  @db.LongText
-  css         String?  @db.LongText
-  twcss       String?  @db.LongText
+  data        String?  @db.LongText
+  preview     String?  @db.LongText
+  previewData String?  @db.LongText
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   published   Boolean  @default(false)
@@ -119,4 +119,14 @@ model Page {
   site        Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([id, siteId], name: "page_site_constraint")
+}
+
+model Example {
+  id            Int     @id @default(autoincrement())
+  name          String?
+  description   String? @db.Text
+  domainCount   Int?
+  url           String?
+  image         String? @db.Text
+  imageBlurhash String? @db.LongText
 }

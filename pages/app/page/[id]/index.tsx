@@ -16,7 +16,6 @@ export default function Page(props:any) {
         </Layout>
     )
   }
-
   return (
     <>
       <Layout siteId={page?.site?.id}>

@@ -25,10 +25,10 @@ module.exports = {
   webpack: (
     config, { isServer, dir }
   ) => {
-    if ( !isServer) {
-       // Fixes npm packages that depend on `fs` module
-      config.resolve.fallback = { fs: false, path: false };
-    }
+    // if ( !isServer) {
+    //    // Fixes npm packages that depend on `fs` module
+    //   config.resolve.fallback = { fs: false, path: false };
+    // }
 
     config.module.rules.push({
       test: /\.svg$/i,

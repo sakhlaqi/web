@@ -10,7 +10,6 @@ interface LayoutProps extends WithChildren {
   meta?: Meta;
   siteId?: string;
   subdomain?: string;
-  children: string;
 }
 
 export default function Layout({ meta, children, subdomain }: LayoutProps) {
@@ -38,7 +37,7 @@ export default function Layout({ meta, children, subdomain }: LayoutProps) {
   }, [closeModal]);
 
   return (
-    <>
+    <div>
       <Head>
         <title>{meta?.title}</title>
         <link rel="icon" href="/favicon.ico" />
@@ -65,9 +64,8 @@ export default function Layout({ meta, children, subdomain }: LayoutProps) {
         <meta name="twitter:title" content={meta?.title} />
         <meta name="twitter:description" content={meta?.description} />
         <meta name="twitter:image" content={meta?.ogImage} />
-        {subdomain != "demo" && <meta name="robots" content="noindex" />}
       </Head>
-      <div dangerouslySetInnerHTML={{ __html: children }} />
-    </>
+      {children}
+    </div>
   );
 }

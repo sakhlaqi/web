@@ -3,9 +3,9 @@ import GrapesJS from 'grapesjs';
 
 //@ts-ignore
 import tailwindcss from 'grapesjs-tailwind';
-
 import {State} from '../../store';
 import {useSelector, useDispatch} from 'react-redux';
+import Loader from "@/components/app/Loader";
 
 import 'grapesjs/dist/css/grapes.min.css';
 import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
@@ -19,7 +19,7 @@ export default function GrapesjsReact(props:any) {
   
     const [editor, setEditor] = React.useState<GrapesJS.Editor>();
     const { page } = useSelector<State, State>(state => state);
-
+    const [visibile, setVisibile] = React.useState(false);
     // fixes problem with tailwind (use of slashes in css class names)
     const escapeName = (name: any) : any => `${name}`.trim().replace(/([^a-z0-9\w-:/]+)/gi, '-');
     const dispatch = useDispatch();
@@ -78,22 +78,30 @@ export default function GrapesjsReact(props:any) {
             }
         })
         // Close all the categories on start.
-        // setTimeout(() => {
-        //   const categories: any = _editor.BlockManager.getCategories();
-        //   categories.each((category : any) => { category.set('open', false); });
-        // }, 500);
+        setTimeout(() => {
+          const categories: any = _editor.BlockManager.getCategories();
+          categories.each((category : any) => { category.set('open', false); });
+        }, 500);
 
-        _editor.loadProjectData( page?.data && JSON.parse(page?.data ) || {});
+        _editor.loadProjectData( page?.previewData && JSON.parse(page?.previewData ) || {});
 
         dispatch({type: 'EDITOR', payload: _editor});
 
         if (typeof onInit === 'function') {
           onInit(_editor);
         }
+        _editor.on('load', (some, argument) => {
+            setTimeout(() => setVisibile(true), 500);
+        })
+
       }
     }, [children, editor, id, onInit]);
-
-    return React.createElement("div", {
-      id: id
-    }, children);
+    return  (
+      <>
+        {!visibile && <Loader />}
+        <div id={id} className="mx-auto absolute top-0 bottom-0 left-0 right-0" style={{ visibility: visibile ? 'visible' : 'hidden' }}>
+          {children}
+        </div>
+      </>
+    )
 }

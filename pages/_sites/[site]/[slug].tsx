@@ -12,6 +12,7 @@ import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
 import prisma from "@/lib/prisma";
 import Tweet from "@/components/mdx/Tweet";
+
 import {
   replaceExamples,
   replaceLinks,
@@ -60,10 +61,9 @@ export default function Page({
     ogUrl: `https://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${data.slug}`,
     title: data.title,
   } as Meta;
-  console.log(data);
   return (
     <Layout meta={meta} subdomain={data.site?.subdomain ?? undefined}>
-      {data.content || ''}
+      <div dangerouslySetInnerHTML={{ __html: data.content || '' }} />
     </Layout>
   );
 }
@@ -123,7 +123,6 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
 export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
   params,
 }) => {
-  console.log('params',params);
   if (!params) throw new Error("No path parameters found");
 
   const { site, slug } = params;

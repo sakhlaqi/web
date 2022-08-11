@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { Page, Site } from ".prisma/client";
 import type { Session } from "next-auth";
 import { revalidate } from "@/lib/revalidate";
+// import fs;
 
 import type { WithSitePage } from "@/types";
 
@@ -215,8 +216,8 @@ export async function updatePage(
     description,
     content,
     data,
-    css,
-    twcss,
+    preview,
+    previewData,
     slug,
     image,
     imageBlurhash,
@@ -226,22 +227,34 @@ export async function updatePage(
     customDomain,
   } = req.body;
 
+  let _update_data = {
+    title,
+    description,
+    slug,
+    preview,
+    previewData,
+  }
+  if ( published ) {
+    _update_data = {
+      ..._update_data, 
+      ...{
+        content,
+        data,
+        published,
+        publishedAt,
+      }
+    }
+  }
+
   try {
     const page = await prisma.page.update({
       where: {
         id: id,
       },
-      data: {
-        title,
-        description,
-        content,
-        data,
-        css,
-        twcss,
-        slug,
-        published,
-      },
+      data: _update_data,
     });
+    const fs = require('fs');
+    fs.writeFileSync('./templates/' + id + (!req.body.published ? '-preview.html' : '.html'), req.body.published ? content : preview);
     if (subdomain) {
       // revalidate for subdomain
       await revalidate(
@@ -257,7 +270,6 @@ export async function updatePage(
         customDomain, // siteId
         slug // slugname for the page
       );
-
     return res.status(200).json(page);
   } catch (error) {
     console.error(error);
