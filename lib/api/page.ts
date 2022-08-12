@@ -4,10 +4,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { Page, Site } from ".prisma/client";
 import type { Session } from "next-auth";
 import { revalidate } from "@/lib/revalidate";
-// import fs;
 
 import type { WithSitePage } from "@/types";
-
 interface AllPages {
   pages: Array<Page>;
   site: Site | null;

@@ -10,32 +10,34 @@ interface LayoutProps extends WithChildren {
   meta?: Meta;
   siteId?: string;
   subdomain?: string;
+  view?: string;
 }
 
-export default function Layout({ meta, children, subdomain }: LayoutProps) {
-  const [scrolled, setScrolled] = useState(false);
+export default function Layout({ meta, children, subdomain, view }: LayoutProps) {
 
-  const onScroll = useCallback(() => {
-    setScrolled(window.pageYOffset > 20);
-  }, []);
+  // const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [onScroll]);
+  // const onScroll = useCallback(() => {
+  //   setScrolled(window.pageYOffset > 20);
+  // }, []);
 
-  const [closeModal, setCloseModal] = useState<boolean>(
-    !!Cookies.get("closeModal")
-  );
+  // useEffect(() => {
+  //   window.addEventListener("scroll", onScroll);
+  //   return () => window.removeEventListener("scroll", onScroll);
+  // }, [onScroll]);
 
-  useEffect(() => {
-    if (closeModal) {
-      Cookies.set("closeModal", "true");
-    } else {
-      Cookies.remove("closeModal");
-    }
-  }, [closeModal]);
+  // const [closeModal, setCloseModal] = useState<boolean>(
+  //   !!Cookies.get("closeModal")
+  // );
 
+  // useEffect(() => {
+  //   if (closeModal) {
+  //     Cookies.set("closeModal", "true");
+  //   } else {
+  //     Cookies.remove("closeModal");
+  //   }
+  // }, [closeModal]);
+  
   return (
     <div>
       <Head>
@@ -64,6 +66,7 @@ export default function Layout({ meta, children, subdomain }: LayoutProps) {
         <meta name="twitter:title" content={meta?.title} />
         <meta name="twitter:description" content={meta?.description} />
         <meta name="twitter:image" content={meta?.ogImage} />
+        {view && view == "preview" && <meta name="robots" content="noindex" />}
       </Head>
       {children}
     </div>

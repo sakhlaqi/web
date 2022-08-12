@@ -13,6 +13,7 @@ import Loader from "@/components/sites/Loader";
 import prisma from "@/lib/prisma";
 import Tweet from "@/components/mdx/Tweet";
 
+
 import {
   replaceExamples,
   replaceLinks,
@@ -21,6 +22,7 @@ import {
 
 import type { AdjacentPage, Meta, _SiteSlugData } from "@/types";
 import type { GetStaticPaths, GetStaticProps } from "next";
+import { _getStaticPaths, _getStaticProps } from '../../../utils/build'
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import type { ParsedUrlQuery } from "querystring";
 
@@ -69,95 +71,13 @@ export default function Page({
 }
 
 export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
-  const pages = await prisma.page.findMany({
-    where: {
-      published: true,
-      // you can remove this if you want to generate all sites at build time
-      site: {
-        subdomain: "salman",
-      },
-    },
-    select: {
-      slug: true,
-      site: {
-        select: {
-          subdomain: true,
-          customDomain: true,
-        },
-      },
-    },
-  });
-
-  return {
-    paths: pages.flatMap((page) => {
-      if (page.site === null || page.site.subdomain === null) return [];
-
-      if (page.site.customDomain) {
-        return [
-          {
-            params: {
-              site: page.site.customDomain,
-              slug: page.slug,
-            },
-          },
-          {
-            params: {
-              site: page.site.subdomain,
-              slug: page.slug,
-            },
-          },
-        ];
-      } else {
-        return {
-          params: {
-            site: page.site.subdomain,
-            slug: page.slug,
-          },
-        };
-      }
-    }),
-    fallback: true,
-  };
+  return await _getStaticPaths();
 };
 
 export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
-  params,
+  params
 }) => {
-  if (!params) throw new Error("No path parameters found");
-
-  const { site, slug } = params;
-
-  let filter: {
-    subdomain?: string;
-    customDomain?: string;
-  } = {
-    subdomain: site,
-  };
-
-  if (site.includes(".")) {
-    filter = {
-      customDomain: site,
-    };
-  }
-
-  const data = (await prisma.page.findFirst({
-    where: {
-      site: {
-        ...filter,
-      },
-      slug,
-    },
-    include: {
-      site: {
-        include: {
-          user: true,
-        },
-      },
-    },
-  })) as _SiteSlugData | null;
-
-  if (!data) return { notFound: true, revalidate: 10 };
-
+  const data = await _getStaticProps(params)
   return {
     props: {
       data: JSON.parse(JSON.stringify(data)),
