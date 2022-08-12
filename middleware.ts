@@ -43,12 +43,20 @@ export default function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  // rewrite for preview pages
+  if ((currentHost.split('.')).includes('preview')) {
+    // rewrite preview paths to `/_preview/[site] dynamic route
+    const _currentHost = currentHost.replace("preview.", '');
+    url.pathname = `/_preview/${_currentHost}${url.pathname}`;
+    // url.searchParams.set('view','preview');
+    return NextResponse.rewrite(url);
+  }
+
   // rewrite root application to `/home` folder
   if (hostname ===  ROOT_DOMAIN) {
     url.pathname = `/home${url.pathname}`;
     return NextResponse.rewrite(url);
   }
-
   // rewrite everything else to `/_sites/[site] dynamic route
   url.pathname = `/_sites/${currentHost}${url.pathname}`;
   return NextResponse.rewrite(url);

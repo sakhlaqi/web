@@ -6,3 +6,4 @@
 **.git
 .vercel
 **.pem
+**/templates
