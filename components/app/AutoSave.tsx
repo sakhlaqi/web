@@ -2,15 +2,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { HttpMethod } from "@/types";
 import toast from "react-hot-toast";
-import type { WithSitePage } from "@/types";
 import CheckIcon from "../../public/icons/check.svg";
 import SaveIcon from "../../public/icons/save.svg";
-
 import {State} from '../../store';
 import {useSelector} from 'react-redux';
 import { useRouter } from "next/router";
 
-import type { WithSitePost } from "@/types";
+import type { WithSitePost, WithSitePage } from "@/types";
 interface AutoSaveProps {
   page? : WithSitePage,
   post? : WithSitePost,

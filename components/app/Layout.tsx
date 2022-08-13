@@ -9,6 +9,7 @@ import useRequireAuth from "../../lib/useRequireAuth";
 
 import {State} from '../../store';
 import {useSelector, useStore} from 'react-redux';
+import AddNew from "@/components/app/AddNew";
 import AutoSave from "@/components/app/AutoSave";
 import type { WithChildren } from "@/types";
 import type { WithSitePage } from "@/types";
@@ -94,7 +95,8 @@ export default function Layout({ siteId, children }: LayoutProps) {
               </button>
             </div>
             
-            {(customPage || postPage) && <AutoSave></AutoSave> }
+            { (['pages', 'posts'].includes(tab)) && <AddNew/>}
+            {(customPage || postPage) && <AutoSave/> }
             
           </div>
         </div>
@@ -129,41 +131,50 @@ export default function Layout({ siteId, children }: LayoutProps) {
                 </a>
               </Link>
               <div className="flex justify-between items-center space-x-10 md:space-x-16">
-                <Link href={`/site/${router.query.id}`} passHref>
-                  <a
-                    className={`border-b-2 ${
-                      (!tab || tab == "pages") ? "border-black" : "border-transparent"
+              <Link href={`/site/${router.query.id}`} passHref>
+                  <span
+                    className={`cursor-pointer border-b-2 ${
+                      (!tab || tab == "dashboard") ? "border-black" : "border-transparent"
+                    } py-3`}
+                  >
+                    Dashboard
+                  </span>
+                </Link>
+                <Link href={`/site/${router.query.id}/pages`} passHref>
+                  <span
+                    className={`cursor-pointer border-b-2 ${
+                      (tab == "pages") ? "border-black" : "border-transparent"
                     } py-3`}
                   >
                     Pages
-                  </a>
+                  </span>
                 </Link>
                 <Link href={`/site/${router.query.id}/posts`} passHref>
-                  <a
-                    className={`border-b-2 ${
+                  <span
+                    className={`cursor-pointer border-b-2 ${
                       tab == "posts" ? "border-black" : "border-transparent"
                     } py-3`}
                   >
                     Posts
-                  </a>
+                  </span>
                 </Link>
-                <Link href={`/site/${router.query.id}/drafts`} passHref>
-                  <a
+                {/* <Link href={`/site/${router.query.id}/drafts`} passHref>
+                  <span
                     className={`border-b-2 ${
                       tab == "drafts" ? "border-black" : "border-transparent"
                     } py-3`}
                   >
                     Drafts
-                  </a>
-                </Link>
+                  </span>
+                </Link> */}
                 <Link href={`/site/${router.query.id}/settings`} passHref>
-                  <a
-                    className={`border-b-2 ${
+                  <span
+                    className={`cursor-pointer border-b-2 ${
                       tab == "settings" ? "border-black" : "border-transparent"
                     } py-3`}
                   >
                     Settings
-                  </a>
+                  </span>
                 </Link>
               </div>
               <div />
