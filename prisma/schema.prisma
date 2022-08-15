@@ -87,7 +87,7 @@ model Post {
   description   String?  @db.Text
   content       String?  @db.LongText
   data          String?  @db.LongText
-  preview       String?  @db.LongText  
+  preview       String?  @db.LongText
   previewData   String?  @db.LongText
   slug          String   @default(cuid())
   image         String?  @db.Text
