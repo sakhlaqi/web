@@ -6,11 +6,6 @@ import Loader from "@/components/app/Loader";
 import {useSelector, useDispatch} from 'react-redux';
 import {wrapper, State} from '../../../../store';
 import type { ChangeEvent } from "react";
-import dynamic from "next/dynamic";
-
-let Editor = dynamic(() => import("@/components/app/Editor"), {
-    ssr: false
-});
 
 export default function Post() {
 
@@ -48,7 +43,7 @@ export default function Post() {
             placeholder="Untitled Post"
             value={data?.title || ''}
           />
-          {/* <TextareaAutosize
+          <TextareaAutosize
             name="description"
             onInput={(e: ChangeEvent<HTMLTextAreaElement>) =>
               setData({
@@ -57,9 +52,9 @@ export default function Post() {
               })
             }
             className="w-full px-2 py-3 text-gray-800 placeholder-gray-400 text-xl mb-3 resize-none border-none focus:outline-none focus:ring-0"
-            placeholder="No excerpt provided. Click to edit."
+            placeholder="No description provided. Click to edit."
             value={data?.description || ''}
-          /> */}
+          />
 
           <div className="relative mb-6">
             <div
@@ -69,10 +64,7 @@ export default function Post() {
               <div className="w-full border-t border-gray-300" />
             </div>
           </div>
-
-          <Editor data={post?.preview} />
-
-          {/* <TextareaAutosize
+          <TextareaAutosize
             name="content"
             onInput={(e: ChangeEvent<HTMLTextAreaElement>) =>
               setData({
@@ -83,7 +75,7 @@ export default function Post() {
             className="w-full px-2 py-3 text-gray-800 placeholder-gray-400 text-lg mb-5 resize-none border-none focus:outline-none focus:ring-0"
             placeholder="No content yet, Click to edit..."
             value={data?.content || ''}
-          /> */}
+          />
         </div>
       </Layout>
     </>

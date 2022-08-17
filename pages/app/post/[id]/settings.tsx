@@ -1,8 +1,7 @@
-import toast, { Toaster } from "react-hot-toast";
 import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-
+import toast from "react-hot-toast";
 import BlurImage from "@/components/BlurImage";
 import CloudinaryUploadWidget from "@/components/Cloudinary";
 import Layout from "@/components/app/Layout";
@@ -114,12 +113,6 @@ export default function PostSettings() {
   return (
     <>
       <Layout siteId={settings?.site?.id}>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 10000,
-          }}
-        />
         <div className="max-w-screen-xl mx-auto px-10 sm:px-20 mt-20 mb-16">
           <h1 className="font-cal text-5xl mb-12">Post Settings</h1>
           <div className="mb-28 flex flex-col space-y-12">

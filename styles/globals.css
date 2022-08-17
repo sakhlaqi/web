@@ -4,17 +4,40 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer base {
+  body,
+  html {
+    margin: 0;
+  }
+  h1 {
+    @apply font-primary text-2xl font-bold md:text-4xl;
+  }
+
+  h2 {
+    @apply font-primary text-xl font-bold md:text-3xl;
+  }
+
+  h3 {
+    @apply font-primary text-lg font-bold md:text-2xl;
+  }
+
+  h4 {
+    @apply font-primary text-base font-bold md:text-lg;
+  }
+
+  body {
+    @apply font-primary text-sm md:text-base;
+  }
+}
+
 @layer utilities {
   .overflow-hidden {
     -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
 }
 
-body,
-html {
-  height: 100%;
-  margin: 0;
-}
+
 
 /* Make blocks full width */
 .gjs-block:not(._cat_Basic, ._cat_Extra, ._cat_Forms) {

@@ -14,11 +14,12 @@ export interface State {
   site: Site|null;
   page: WithSitePage|null;
   post: WithSitePost|null;
-  editor: GrapesJS.Editor | null;
+  editor: any | null;
+  builder: GrapesJS.Editor | null;
 }
 
 // create your reducer
-const reducer = (state: State = {site: null, page: null,post: null, editor: null}, action: AnyAction) => {
+const reducer = (state: State = {site: null, page: null,post: null, builder: null, editor: null}, action: AnyAction) => {
   switch (action.type) {
     case HYDRATE:
       if (action.payload.site === null) delete action.payload.site;
@@ -32,6 +33,8 @@ const reducer = (state: State = {site: null, page: null,post: null, editor: null
       return {...state, page: action.payload};
     case 'POST':
       return {...state, post: action.payload};
+    case 'BUILDER':
+        return {...state, builder: action.payload};
     case 'EDITOR':
         return {...state, editor: action.payload};
     default:

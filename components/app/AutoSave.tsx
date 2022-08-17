@@ -21,7 +21,9 @@ export default function AutoSave (props: AutoSaveProps) {
   const _key = router.asPath.split("/")[1];
   const _type = _key == 'page' ? _key : 'post';
   const data = useSelector<State, State[typeof _type]>(state => state[_type]);
-  const { editor } = useSelector<State, State>(state => state);
+  const { builder, editor } = useSelector<State, State>(state => state);
+
+  // console.log('AutoSave, Editor:',editor)
 
   const [savedState, setSavedState] = useState(
     data
@@ -41,17 +43,26 @@ export default function AutoSave (props: AutoSaveProps) {
   );
 
   const saveChanges = useCallback(
-    async (_data:typeof data, _editor:typeof editor) => {
+    async (_data:typeof data, _builder:typeof builder, _editor:typeof editor) => {
       setSaveState("Saving...");
-
       const body = {
         id: _data?.id,
         title: _data?.title,
         description: _data?.description,
-        previewData: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.previewData,
-        preview: _editor && _editor?.getHtml() || _data?.preview,
+        previewData: _data?.previewData,
+        preview: _data?.preview,
       }
-      // _editor && _editor.runCommand('get-tailwindCss', {
+      switch (_type) { 
+        case "post" :
+          body.preview = _editor && _editor?.getData() || _data?.preview;
+          break;
+        case "page" :
+          body.preview = _builder && _builder?.getHtml() || _data?.preview;
+          body.previewData = _builder && JSON.stringify(_builder?.getProjectData()) || _data?.previewData;
+          break;
+      }
+      // if ()
+      // _builder && _builder.runCommand('get-tailwindCss', {
       //   callback: (_twcss:string) => { body.twcss = _twcss; },
       // });
       try {
@@ -77,6 +88,7 @@ export default function AutoSave (props: AutoSaveProps) {
             }).format(new Date(responseData.updatedAt))}`
           );
           setSaveState("Save");
+          toast.success("Successfully Saved!");
         } else {
           setSaveState("Save");
           toast.error("Failed to save");
@@ -89,7 +101,7 @@ export default function AutoSave (props: AutoSaveProps) {
   );
 
   const triggerSave = () => {
-    saveChanges(data, editor)
+    saveChanges(data, builder, editor)
   }
 
   //uncomment to enable Auto Save
@@ -113,7 +125,7 @@ export default function AutoSave (props: AutoSaveProps) {
 
       if ((e.ctrlKey || e.metaKey) && charCode === "s") {
         e.preventDefault();
-        saveChanges(data, editor);
+        saveChanges(data, builder, editor);
       }
     }
     window.addEventListener("keydown", clickedSave);
@@ -121,21 +133,33 @@ export default function AutoSave (props: AutoSaveProps) {
     return () => window.removeEventListener("keydown", clickedSave);
   }, [data, saveChanges]);
 
-  async function publish(_data:typeof data, _editor:typeof editor) {
+  async function publish(_data:typeof data, _builder:typeof builder, _editor:typeof editor) {
     setPublishing(true);
     try {
       const body = {
         id: _data?.id,
         title: _data?.title,
         description: _data?.description,
-        data: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
-        content: _editor && _editor?.getHtml() || _data?.content,
-        previewData: _editor && JSON.stringify(_editor?.getProjectData()) || _data?.data,
-        preview: _editor && _editor?.getHtml() || _data?.content,
+        previewData: _data?.previewData,
+        preview: _data?.preview,
+        data: _data?.data,
+        content: _data?.content,
         published: true,
         subdomain: _data?.site?.subdomain,
         customDomain: _data?.site?.customDomain,
         slug: _data?.slug,
+      }
+      switch (_type) { 
+        case "post" :
+          body.content = _editor && _editor?.getData() || _data?.content
+          body.preview = _editor && _editor?.getData() || _data?.content
+          break;
+        case "page" :
+          body.data = _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data
+          body.content = _builder && _builder?.getHtml() || _data?.content
+          body.previewData = _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data
+          body.preview = _builder && _builder?.getHtml() || _data?.content
+          break;
       }
       const response = await fetch(`/api/` + _type, {
         method: HttpMethod.PUT,
@@ -144,9 +168,11 @@ export default function AutoSave (props: AutoSaveProps) {
         },
         body: JSON.stringify(body),
       });
-
       if (response.ok) {
         // mutate(`/api/page?pageId=${page?.id}`);
+        toast.success("Successfully Published!");
+      } else {
+        toast.error("Failed to publish");
       }
     } catch (error) {
       console.error(error);
@@ -178,7 +204,7 @@ export default function AutoSave (props: AutoSaveProps) {
 
           <button
             onClick={async () => {
-              await publish(data, editor);
+              await publish(data, builder);
             }}
             title={
               disabled
