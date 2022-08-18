@@ -204,7 +204,7 @@ export default function AutoSave (props: AutoSaveProps) {
 
           <button
             onClick={async () => {
-              await publish(data, builder);
+              await publish(data, builder, editor);
             }}
             title={
               disabled

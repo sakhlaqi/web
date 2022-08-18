@@ -21,7 +21,7 @@ import {
 
 import type { AdjacentPage, Meta, _SiteSlugData } from "@/types";
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { _getStaticPaths, _getStaticProps } from '../../../utils/build'
+import { _getStaticPaths, _getStaticProps } from '../../../utils/pages'
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import type { ParsedUrlQuery } from "querystring";
 

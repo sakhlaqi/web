@@ -44,13 +44,13 @@ export default function Rows() {
             {data && data[_types] ? (
                 data[_types].length > 0 ? (
                 data[_types].map((item:RowsProps) => (
-                    <div key={item.id} className="flex items-center hover:bg-gray-200 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
+                    <div key={item.id} className="flex bg-white items-center hover:bg-sky-50 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
                     <Link href={`/${_type}/${item.id}`} >
                         <div className="font-cal bold flex-1 px-2 my-2" >
                         {item.title || item.name || "Untitled"}
                         </div>
                     </Link>
-                    <a className="font-cal px-3 my-2 tracking-wide bg-gray-100 text-gray-600 text-gray-400 whitespace-nowrap"
+                    <a className="font-cal px-3 my-2 tracking-wide bg-slate-50 text-gray-600 text-gray-400 whitespace-nowrap"
                         href={`http://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${_type != 'page' ?  _type + '/' : ''}${item.slug}`}
                         rel="noreferrer" target="_blank"
                     >

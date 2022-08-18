@@ -11,6 +11,7 @@ export default function Editor (props:any) {
     return (
         <CKEditor
             onReady={ (editor:any) => {
+                // console.log(`toolbar`,editor.ui.view.toolbar);
                 // Insert the toolbar before the editable area.
                 editor.ui.getEditableElement().parentElement.insertBefore(
                     editor.ui.view.toolbar.element,
@@ -27,7 +28,7 @@ export default function Editor (props:any) {
             editor={ DecoupledEditor }
             data={props.data}
             config={{
-                placeholder : 'Write something, start here...'
+                placeholder : 'Write something, start here...',
             }}
         />
     )

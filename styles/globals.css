@@ -27,7 +27,7 @@
   }
 
   body {
-    @apply font-primary text-sm md:text-base;
+    @apply font-primary text-sm md:text-base bg-slate-100;
   }
 }
 
@@ -36,8 +36,6 @@
     -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
 }
-
-
 
 /* Make blocks full width */
 .gjs-block:not(._cat_Basic, ._cat_Extra, ._cat_Forms) {
@@ -59,4 +57,16 @@
 
 .gjs-two-color {
   color: #fff !important;
+}
+
+.gjs-editor .gjs-cv-canvas {
+  background-color: rgb(248 250 252);
+}
+
+.ck.ck-toolbar {
+  border: none;
+}
+.ck-content {
+  background-color: #fff;
+  margin-top: 2px;
 }
