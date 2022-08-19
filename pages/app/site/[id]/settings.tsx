@@ -1,9 +1,8 @@
 import { useDebounce } from "use-debounce";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
 import useSWR, { mutate } from "swr";
-
+import toast from "react-hot-toast";
 import BlurImage from "@/components/BlurImage";
 import CloudinaryUploadWidget from "@/components/Cloudinary";
 import DomainCard from "@/components/app/DomainCard";
@@ -165,12 +164,6 @@ export default function SiteSettings() {
 
   return (
     <Layout>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 10000,
-        }}
-      />
       <div className="max-w-screen-xl mx-auto px-10 sm:px-20 mt-20 mb-16">
         <h1 className="font-cal text-5xl mb-12">Site Settings</h1>
         <div className="mb-28 flex flex-col space-y-12">

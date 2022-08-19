@@ -17,7 +17,7 @@ export default function GrapesjsReact(props:any) {
         onInit = props.onInit,
         children = props.children;
   
-    const [editor, setEditor] = React.useState<GrapesJS.Editor>();
+    const [builder, setBuilder] = React.useState<GrapesJS.Editor>();
     const { page } = useSelector<State, State>(state => state);
     const [visibile, setVisibile] = React.useState(false);
     // fixes problem with tailwind (use of slashes in css class names)
@@ -26,15 +26,15 @@ export default function GrapesjsReact(props:any) {
 
     React.useEffect(function () {
       var selector = "#" + id;
-      if (!editor) {
-        var _editor = GrapesJS.init({
-            // Indicate where to init the editor. You can also pass an HTMLElement
+      if (!builder) {
+        var _builder = GrapesJS.init({
+            // Indicate where to init the builder. You can also pass an HTMLElement
             container: selector,
             // Get the content for the canvas directly from the element
             // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
             fromElement: true,
             height: '100%',
-            /** Show the wrapper component in the final code, eg. in editor.getHtml() */
+            /** Show the wrapper component in the final code, eg. in builder.getHtml() */
             exportWrapper: false,
             wrapperIsBody: false,
             // Disable the storage manager for the moment
@@ -68,10 +68,10 @@ export default function GrapesjsReact(props:any) {
             }
         });
         
-        setEditor(_editor);
+        setBuilder(_builder);
 
         //Adding _cat_... class to predefined blocks
-        const blocks = _editor.BlockManager.getAll();
+        const blocks = _builder.BlockManager.getAll();
         blocks.map( (block:any) => {
             if(['Basic','Extra','Forms'].includes(block.attributes.category)){
                 block.attributes.attributes.class += ' _cat_' + block.attributes.category
@@ -79,23 +79,23 @@ export default function GrapesjsReact(props:any) {
         })
         // Close all the categories on start.
         setTimeout(() => {
-          const categories: any = _editor.BlockManager.getCategories();
+          const categories: any = _builder.BlockManager.getCategories();
           categories.each((category : any) => { category.set('open', false); });
         }, 500);
 
-        _editor.loadProjectData( page?.previewData && JSON.parse(page?.previewData ) || {});
+        _builder.loadProjectData( page?.previewData && JSON.parse(page?.previewData ) || {});
 
-        dispatch({type: 'EDITOR', payload: _editor});
+        dispatch({type: 'BUILDER', payload: _builder});
 
         if (typeof onInit === 'function') {
-          onInit(_editor);
+          onInit(_builder);
         }
-        _editor.on('load', (some, argument) => {
+        _builder.on('load', (some, argument) => {
             setTimeout(() => setVisibile(true), 500);
         })
 
       }
-    }, [children, editor, id, onInit]);
+    }, [children, builder, id, onInit]);
     return  (
       <>
         {!visibile && <Loader />}

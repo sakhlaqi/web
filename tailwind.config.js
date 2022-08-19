@@ -10,6 +10,7 @@ module.exports = {
   darkMode: "media",
   theme: {
     fontFamily: {
+      primary: ["Cal Sans", "Inter var", "sans-serif"],
       cal: ["Cal Sans", "Inter var", "sans-serif"],
     },
     extend: {

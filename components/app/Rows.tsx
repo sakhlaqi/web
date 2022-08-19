@@ -44,13 +44,13 @@ export default function Rows() {
             {data && data[_types] ? (
                 data[_types].length > 0 ? (
                 data[_types].map((item:RowsProps) => (
-                    <div key={item.id} className="flex items-center hover:bg-gray-200 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
+                    <div key={item.id} className="flex bg-white items-center hover:bg-sky-50 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
                     <Link href={`/${_type}/${item.id}`} >
                         <div className="font-cal bold flex-1 px-2 my-2" >
                         {item.title || item.name || "Untitled"}
                         </div>
                     </Link>
-                    <a className="font-cal px-3 my-2 tracking-wide bg-gray-100 text-gray-600 text-gray-400 whitespace-nowrap"
+                    <a className="font-cal px-3 my-2 tracking-wide bg-slate-50 text-gray-600 text-gray-400 whitespace-nowrap"
                         href={`http://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${_type != 'page' ?  _type + '/' : ''}${item.slug}`}
                         rel="noreferrer" target="_blank"
                     >
@@ -61,8 +61,8 @@ export default function Rows() {
                 ) : (
                 <>
                     <div className="flex items-center hover:bg-gray-200 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
-                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-300" >&nbsp;</div>
-                    <div className="w-48 pb-1 mb-2 bg-gray-200">&nbsp;</div>
+                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-200" >&nbsp;</div>
+                    <div className="w-48 pb-1 mb-2 bg-gray-100">&nbsp;</div>
                     </div>
                     <div className="text-center">
                     <p className="text-medium font-cal font-thin text-gray-400">
@@ -74,8 +74,8 @@ export default function Rows() {
             ) : (
                 [0, 1].map((i) => (
                 <div key={i} className="flex items-center hover:bg-gray-200 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
-                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-300 animate-pulse" ><LoadingDots/></div>
-                    <div className="w-48 pb-1 mb-2 bg-gray-200 animate-pulse">&nbsp;</div>
+                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-200 animate-pulse" ><LoadingDots/></div>
+                    <div className="w-48 pb-1 mb-2 bg-gray-100 animate-pulse">&nbsp;</div>
                 </div>
                 ))
             )}

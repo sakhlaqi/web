@@ -13,6 +13,7 @@ import AddNew from "@/components/app/AddNew";
 import AutoSave from "@/components/app/AutoSave";
 import type { WithChildren } from "@/types";
 import type { WithSitePage } from "@/types";
+import toast, { Toaster } from "react-hot-toast";
 
 interface LayoutProps extends WithChildren {
   siteId?: string;
@@ -66,6 +67,12 @@ export default function Layout({ siteId, children }: LayoutProps) {
           <meta name="twitter:description" content={description} />
           <meta name="twitter:image" content={logo} />
         </Head>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 2000,
+          }}
+        />
         <div className="absolute left-0 right-0 h-16 border-b bg-white border-gray-200">
           <div className="flex justify-between items-center h-full max-w-screen-xl mx-auto px-10 sm:px-20">
             <div className="flex space-x-4">

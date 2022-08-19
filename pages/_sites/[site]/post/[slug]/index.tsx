@@ -1,51 +1,29 @@
-import remarkMdx from "remark-mdx";
-import { MDXRemote } from "next-mdx-remote";
-import { remark } from "remark";
-import { serialize } from "next-mdx-remote/serialize";
-import { useRouter } from "next/router";
 
-import BlogCard from "@/components/BlogCard";
-import BlurImage from "@/components/BlurImage";
-import Date from "@/components/Date";
-import Examples from "@/components/mdx/Examples";
+import { useState, useEffect } from "react";
 import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
-import prisma from "@/lib/prisma";
-import Tweet from "@/components/mdx/Tweet";
+import {useSelector, useDispatch} from 'react-redux';
 
-
-import {
-  replaceExamples,
-  replaceLinks,
-  replaceTweets,
-} from "@/lib/remark-plugins";
-
-import type { AdjacentPage, Meta, _SiteSlugData } from "@/types";
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { _getStaticPaths, _getStaticProps } from '../../../utils/pages'
-import type { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { _getStaticPaths, _getStaticProps } from '../../../../../utils/posts'
 import type { ParsedUrlQuery } from "querystring";
-
-const components = {
-  a: replaceLinks,
-  BlurImage,
-  Examples,
-  Tweet,
-};
+import { useRouter } from "next/router";
+import type { AdjacentPage, Meta } from "@/types";
 
 interface PathProps extends ParsedUrlQuery {
   site: string;
   slug: string;
 }
 
-import type { WithSitePage } from "@/types";
-interface PageProps {
-  data: WithSitePage;
+
+import type { WithSitePost } from "@/types";
+interface DataProps {
+  data: WithSitePost;
 }
 
-export default function Page({
+export default function Post({
   data,
-}: PageProps) {
+}: DataProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
 
@@ -74,7 +52,7 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
   return await _getStaticPaths();
 };
 
-export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
+export const getStaticProps: GetStaticProps<DataProps, PathProps> = async ({
   params
 }) => {
   const data = await _getStaticProps(params)
@@ -85,3 +63,4 @@ export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
     revalidate: 3600,
   };
 };
+

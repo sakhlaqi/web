@@ -4,16 +4,37 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer base {
+  body,
+  html {
+    margin: 0;
+  }
+  h1 {
+    @apply font-primary text-2xl font-bold md:text-4xl;
+  }
+
+  h2 {
+    @apply font-primary text-xl font-bold md:text-3xl;
+  }
+
+  h3 {
+    @apply font-primary text-lg font-bold md:text-2xl;
+  }
+
+  h4 {
+    @apply font-primary text-base font-bold md:text-lg;
+  }
+
+  body {
+    @apply font-primary text-sm md:text-base bg-slate-100;
+  }
+}
+
 @layer utilities {
   .overflow-hidden {
     -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
-}
-
-body,
-html {
-  height: 100%;
-  margin: 0;
 }
 
 /* Make blocks full width */
@@ -36,4 +57,16 @@ html {
 
 .gjs-two-color {
   color: #fff !important;
+}
+
+.gjs-editor .gjs-cv-canvas {
+  background-color: rgb(248 250 252);
+}
+
+.ck.ck-toolbar {
+  border: none;
+}
+.ck-content {
+  background-color: #fff;
+  margin-top: 2px;
 }
