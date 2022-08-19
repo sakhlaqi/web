@@ -98,6 +98,7 @@ model Post {
   publishedAt   DateTime @default(now())
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId        String?
+  type          String?  @db.Text
 
   @@unique([id, siteId], name: "post_site_constraint")
 }
@@ -116,6 +117,7 @@ model Page {
   published   Boolean  @default(false)
   publishedAt DateTime @default(now())
   siteId      String?
+  type        String?  @db.Text
   site        Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([id, siteId], name: "page_site_constraint")
@@ -129,4 +131,44 @@ model Example {
   url           String?
   image         String? @db.Text
   imageBlurhash String? @db.LongText
+}
+
+model c87b27_9718_58ec_b6d2_699a3ee216d3_20220818193626_vrepl {
+  id            String   @id
+  title         String?  @db.Text
+  description   String?  @db.Text
+  content       String?  @db.LongText
+  slug          String
+  image         String?  @db.Text
+  imageBlurhash String?  @db.LongText
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  published     Boolean  @default(false)
+  siteId        String?
+  data          String?  @db.LongText
+  publishedAt   DateTime @default(now())
+  preview       String?  @db.LongText
+  previewData   String?  @db.LongText
+
+  @@unique([id, siteId], map: "Post_id_siteId_key")
+  @@map("_34c87b27_9718_58ec_b6d2_699a3ee216d3_20220818193626_vrepl")
+}
+
+model b6a4ecd_dab3_56c0_88f4_0517612e9ea9_20220818193617_vrepl {
+  id          String   @id
+  title       String?  @db.Text
+  description String?  @db.Text
+  content     String?  @db.LongText
+  slug        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  published   Boolean  @default(false)
+  siteId      String?
+  data        String?  @db.LongText
+  publishedAt DateTime @default(now())
+  preview     String?  @db.LongText
+  previewData String?  @db.LongText
+
+  @@unique([id, siteId], map: "Page_id_siteId_key")
+  @@map("_4b6a4ecd_dab3_56c0_88f4_0517612e9ea9_20220818193617_vrepl")
 }
