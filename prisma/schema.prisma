@@ -9,23 +9,8 @@ datasource db {
   referentialIntegrity = "prisma"
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  username      String?
-  gh_username   String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  sites         Site[]
-}
-
 model Account {
-  id                       String  @id @default(cuid())
+  id                       String  @id
   userId                   String
   type                     String
   provider                 String
@@ -40,87 +25,9 @@ model Account {
   session_state            String?
   oauth_token_secret       String?
   oauth_token              String?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model Site {
-  id            String   @id @default(cuid())
-  name          String?
-  description   String?  @db.Text
-  logo          String?
-  image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
-  subdomain     String?  @unique
-  customDomain  String?  @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User?    @relation(fields: [userId], references: [id])
-  userId        String?
-  posts         Post[]
-  pages         Page[]
-}
-
-model Post {
-  id            String   @id @default(cuid())
-  type          String  @default("post")
-  title         String?  @db.Text
-  description   String?  @db.Text
-  content       String?  @db.LongText
-  data          String?  @db.LongText
-  preview       String?  @db.LongText
-  previewData   String?  @db.LongText
-  slug          String   @default(cuid())
-  image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  published     Boolean  @default(false)
-  publishedAt   DateTime @default(now())
-  site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  siteId        String?
-
-  @@unique([id, siteId], name: "post_site_constraint")
-}
-
-model Page {
-  id          String   @id @default(cuid())
-  type        String  @default("page")
-  title       String?  @db.Text
-  description String?  @db.Text
-  slug        String   @default(cuid())
-  content     String?  @db.LongText
-  data        String?  @db.LongText
-  preview     String?  @db.LongText
-  previewData String?  @db.LongText
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  published   Boolean  @default(false)
-  publishedAt DateTime @default(now())
-  siteId      String?
-  site        Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
-
-  @@unique([id, siteId], name: "page_site_constraint")
 }
 
 model Example {
@@ -133,28 +40,7 @@ model Example {
   imageBlurhash String? @db.LongText
 }
 
-model c87b27_9718_58ec_b6d2_699a3ee216d3_20220818193626_vrepl {
-  id            String   @id
-  title         String?  @db.Text
-  description   String?  @db.Text
-  content       String?  @db.LongText
-  slug          String
-  image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime
-  published     Boolean  @default(false)
-  siteId        String?
-  data          String?  @db.LongText
-  publishedAt   DateTime @default(now())
-  preview       String?  @db.LongText
-  previewData   String?  @db.LongText
-
-  @@unique([id, siteId], map: "Post_id_siteId_key")
-  @@map("_34c87b27_9718_58ec_b6d2_699a3ee216d3_20220818193626_vrepl")
-}
-
-model b6a4ecd_dab3_56c0_88f4_0517612e9ea9_20220818193617_vrepl {
+model Page {
   id          String   @id
   title       String?  @db.Text
   description String?  @db.Text
@@ -165,10 +51,52 @@ model b6a4ecd_dab3_56c0_88f4_0517612e9ea9_20220818193617_vrepl {
   published   Boolean  @default(false)
   siteId      String?
   data        String?  @db.LongText
-  publishedAt DateTime @default(now())
   preview     String?  @db.LongText
   previewData String?  @db.LongText
+  type        String   @default("page")
 
-  @@unique([id, siteId], map: "Page_id_siteId_key")
-  @@map("_4b6a4ecd_dab3_56c0_88f4_0517612e9ea9_20220818193617_vrepl")
+  @@unique([id, siteId])
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  @@index([userId])
+}
+
+model Site {
+  id            String   @id
+  name          String?
+  description   String?  @db.Text
+  logo          String?
+  image         String?  @db.Text
+  imageBlurhash String?  @db.LongText
+  subdomain     String?  @unique
+  customDomain  String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  userId        String?
+}
+
+model User {
+  id            String    @id
+  name          String?
+  username      String?
+  gh_username   String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

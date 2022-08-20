@@ -15,7 +15,6 @@ interface RowsProps {
     createdAt: Date
     updatedAt: Date
     published?: boolean
-    publishedAt?: Date
     siteId: string | null
 }
   
