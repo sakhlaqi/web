@@ -85,4 +85,4 @@ export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
     },
     revalidate: 3600,
   };
-};
+}

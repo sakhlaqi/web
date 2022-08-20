@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
@@ -63,5 +62,4 @@ export const getStaticProps: GetStaticProps<DataProps, PathProps> = async ({
     },
     revalidate: 3600,
   };
-};
-
+}
