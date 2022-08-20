@@ -83,6 +83,7 @@ model Site {
 
 model Post {
   id            String   @id @default(cuid())
+  type          String  @default("post")
   title         String?  @db.Text
   description   String?  @db.Text
   content       String?  @db.LongText
@@ -98,13 +99,13 @@ model Post {
   publishedAt   DateTime @default(now())
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId        String?
-  type          String?  @db.Text
 
   @@unique([id, siteId], name: "post_site_constraint")
 }
 
 model Page {
   id          String   @id @default(cuid())
+  type        String  @default("page")
   title       String?  @db.Text
   description String?  @db.Text
   slug        String   @default(cuid())
@@ -117,7 +118,6 @@ model Page {
   published   Boolean  @default(false)
   publishedAt DateTime @default(now())
   siteId      String?
-  type        String?  @db.Text
   site        Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([id, siteId], name: "page_site_constraint")

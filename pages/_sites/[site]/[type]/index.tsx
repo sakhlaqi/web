@@ -13,6 +13,7 @@ import Loader from "@/components/sites/Loader";
 import prisma from "@/lib/prisma";
 import Tweet from "@/components/mdx/Tweet";
 
+
 import {
   replaceExamples,
   replaceLinks,
@@ -21,7 +22,7 @@ import {
 
 import type { AdjacentPage, Meta, _SiteSlugData } from "@/types";
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { _getStaticPaths, _getStaticProps } from '../../../utils/pages'
+import { _getStaticPaths, _getStaticProps } from '../../../../utils/pages'
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import type { ParsedUrlQuery } from "querystring";
 
@@ -35,6 +36,7 @@ const components = {
 interface PathProps extends ParsedUrlQuery {
   site: string;
   slug: string;
+  type: string;
 }
 
 import type { WithSitePage } from "@/types";
@@ -47,7 +49,7 @@ export default function Page({
 }: PageProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
-  
+
   // const data = JSON.parse(stringifiedData) as _SiteSlugData & {
   //   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
   // };
@@ -63,9 +65,9 @@ export default function Page({
     title: data.title,
   } as Meta;
   return (
-    <Layout meta={meta} view='preview' subdomain={data.site?.subdomain ?? undefined}>
-      <div dangerouslySetInnerHTML={{ __html: data.preview || '' }} />
-      </Layout>
+    <Layout meta={meta} subdomain={data.site?.subdomain ?? undefined}>
+      <div dangerouslySetInnerHTML={{ __html: data.content || '' }} />
+    </Layout>
   );
 }
 

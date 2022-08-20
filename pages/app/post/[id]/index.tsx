@@ -34,7 +34,7 @@ export default function Post() {
 
   return (
     <>
-      <Layout siteId={post?.site?.id}>
+      <Layout siteId={data?.site?.id}>
         <div className="max-w-screen-xl mx-auto px-10 sm:px-20 mt-10 mb-16">
           <TextareaAutosize
             name="title"
@@ -58,9 +58,11 @@ export default function Post() {
 export const getServerSideProps = wrapper.getServerSideProps(store => async ({req, res, params}) => {
   //@ts-ignore
   const {id} = params;
-  const post = await prisma?.post.findFirst({
+
+  const post = await prisma?.page.findFirst({
     where: {
-      id: id
+      id: id,
+      type: 'post',
     },
     include: {
       site: true,

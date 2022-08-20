@@ -32,7 +32,8 @@ export default function Rows() {
     // }
 
     const { data } = useSWR<any>(
-        siteId && `/api/${_type}?siteId=${siteId}&published=true`,
+        // siteId && `/api/${_type}?siteId=${siteId}&published=true`,
+        siteId && `/api/page?siteId=${siteId}&type=${_type}&published=true`,
         fetcher,
         {
             onSuccess: (data) => !data?.site && router.push("/"),
@@ -41,9 +42,9 @@ export default function Rows() {
     
     return (
         <>
-            {data && data[_types] ? (
-                data[_types].length > 0 ? (
-                data[_types].map((item:RowsProps) => (
+            {data && data.data ? (
+                data.data.length > 0 ? (
+                data.data.map((item:RowsProps) => (
                     <div key={item.id} className="flex bg-white items-center hover:bg-sky-50 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
                     <Link href={`/${_type}/${item.id}`} >
                         <div className="font-cal bold flex-1 px-2 my-2" >
@@ -61,8 +62,8 @@ export default function Rows() {
                 ) : (
                 <>
                     <div className="flex items-center hover:bg-gray-200 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
-                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-200" >&nbsp;</div>
-                    <div className="w-48 pb-1 mb-2 bg-gray-100">&nbsp;</div>
+                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-300" >&nbsp;</div>
+                    <div className="w-48 pb-1 mb-2 bg-gray-200">&nbsp;</div>
                     </div>
                     <div className="text-center">
                     <p className="text-medium font-cal font-thin text-gray-400">
@@ -74,8 +75,8 @@ export default function Rows() {
             ) : (
                 [0, 1].map((i) => (
                 <div key={i} className="flex items-center hover:bg-gray-200 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
-                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-200 animate-pulse" ><LoadingDots/></div>
-                    <div className="w-48 pb-1 mb-2 bg-gray-100 animate-pulse">&nbsp;</div>
+                    <div className="flex-1 px-2 pb-1 mb-2 text-slate-300 bg-gray-300 animate-pulse" ><LoadingDots/></div>
+                    <div className="w-48 pb-1 mb-2 bg-gray-200 animate-pulse">&nbsp;</div>
                 </div>
                 ))
             )}

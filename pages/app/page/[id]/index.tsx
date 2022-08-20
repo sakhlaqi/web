@@ -46,7 +46,8 @@ export const getServerSideProps = wrapper.getServerSideProps(store => async ({re
   const {id} = params;
   const page = await prisma?.page.findFirst({
     where: {
-      id: id
+      id: id,
+      type: 'page',
     },
     include: {
       site: true,

@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 export default function Editor (props:any) {
     let _editor:any = null;
     const dispatch = useDispatch();
-    console.log('props.data',props.data);
     return (
         <CKEditor
             onReady={ (editor:any) => {

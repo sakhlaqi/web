@@ -9,44 +9,12 @@ import LoadingDots from "@/components/app/loading-dots";
 import { fetcher } from "@/lib/fetcher";
 import { HttpMethod } from "@/types";
 
-import type { Page, Site } from "@prisma/client";
-
-interface SitePageData {
-  pages: Array<Page>;
-  site: Site | null;
-}
+import type { Site } from "@prisma/client";
 
 export default function SiteIndex() {
-  const [creatingPage, setCreatingPage] = useState(false);
 
   const router = useRouter();
   const { id: siteId } = router.query;
-
-  const { data } = useSWR<SitePageData>(
-    siteId && `/api/page?siteId=${siteId}`,
-    fetcher,
-    {
-      onSuccess: (data) => !data?.site && router.push("/"),
-    }
-  );
-
-  async function createPage(siteId: string) {
-    try {
-      const res = await fetch(`/api/page?siteId=${siteId}`, {
-        method: HttpMethod.POST,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        router.push(`/page/${data.pageId}`);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
     <Layout>

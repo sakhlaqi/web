@@ -5,10 +5,11 @@ import type { _SiteSlugData } from "@/types";
 interface PathProps extends ParsedUrlQuery {
     site: string;
     slug: string;
+    type: string;
 }
 
 export const _getStaticPaths = async () => {
-    const pages = await prisma.page.findMany({
+    const rows = await prisma.page.findMany({
       where: {
         published: true,
         // you can remove this if you want to generate all sites at build time
@@ -18,6 +19,7 @@ export const _getStaticPaths = async () => {
       },
       select: {
         slug: true,
+        type: true,
         site: {
           select: {
             subdomain: true,
@@ -28,29 +30,32 @@ export const _getStaticPaths = async () => {
     });
   
     return {
-      paths: pages.flatMap((page) => {
-        if (page.site === null || page.site.subdomain === null) return [];
+      paths: rows.flatMap((row) => {
+        if (row.site === null || row.site.subdomain === null) return [];
   
-        if (page.site.customDomain) {
+        if (row.site.customDomain) {
           return [
             {
               params: {
-                site: page.site.customDomain,
-                slug: page.slug,
+                site: row.site.customDomain,
+                slug: row.slug,
+                type: row.type,
               },
             },
             {
               params: {
-                site: page.site.subdomain,
-                slug: page.slug,
+                site: row.site.subdomain,
+                slug: row.slug,
+                type: row.type,
               },
             },
           ];
         } else {
           return {
             params: {
-              site: page.site.subdomain,
-              slug: page.slug,
+              site: row.site.subdomain,
+              slug: row.slug,
+              type: row.type,
             },
           };
         }
@@ -64,7 +69,10 @@ export const _getStaticProps = async (
   ) => {
     if (!params) throw new Error("No path parameters found");
   
-    const { site, slug } = params;
+    const { site } = params;
+
+    const slug = params.type && ! params.slug ? params.type : params.slug
+    const type = params.slug && params.type || undefined
   
     let filter: {
       subdomain?: string;
@@ -78,12 +86,13 @@ export const _getStaticProps = async (
         customDomain: site,
       };
     }
-  
-    const data = (await prisma.page.findFirst({
+
+    let _filter = {
       where: {
         site: {
           ...filter,
         },
+        type,
         slug,
       },
       include: {
@@ -93,7 +102,9 @@ export const _getStaticProps = async (
           },
         },
       },
-    })) as _SiteSlugData | null;
+    }
+  
+    const data = (await prisma.page.findFirst(_filter)) as _SiteSlugData | null;
   
     if (!data) return { notFound: true, revalidate: 10 };
 

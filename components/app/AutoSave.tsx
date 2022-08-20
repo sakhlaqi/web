@@ -17,14 +17,10 @@ interface AutoSaveProps {
 export default function AutoSave (props: AutoSaveProps) {
 
   const router = useRouter();
-  
   const _key = router.asPath.split("/")[1];
   const _type = _key == 'page' ? _key : 'post';
   const data = useSelector<State, State[typeof _type]>(state => state[_type]);
   const { builder, editor } = useSelector<State, State>(state => state);
-
-  // console.log('AutoSave, Editor:',editor)
-
   const [savedState, setSavedState] = useState(
     data
       ? `Last saved at ${Intl.DateTimeFormat("en", { month: "short" }).format(
@@ -45,20 +41,32 @@ export default function AutoSave (props: AutoSaveProps) {
   const saveChanges = useCallback(
     async (_data:typeof data, _builder:typeof builder, _editor:typeof editor) => {
       setSaveState("Saving...");
-      const body = {
+      let body = {
         id: _data?.id,
+        type: _data?.type || _type,
+        slug: _data?.slug,
+        subdomain: _data?.site?.subdomain,
+        customDomain: _data?.site?.customDomain,
         title: _data?.title,
         description: _data?.description,
-        previewData: _data?.previewData,
-        preview: _data?.preview,
       }
       switch (_type) { 
         case "post" :
-          body.preview = _editor && _editor?.getData() || _data?.preview;
+          body = {
+            ...body,
+            ... {
+              preview : _editor && _editor?.getData() || _data?.content,
+            }
+          }
           break;
         case "page" :
-          body.preview = _builder && _builder?.getHtml() || _data?.preview;
-          body.previewData = _builder && JSON.stringify(_builder?.getProjectData()) || _data?.previewData;
+          body = {
+            ...body,
+            ... {
+              preview : _builder && _builder?.getHtml() || _data?.content,
+              previewData : _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data,
+            }
+          }
           break;
       }
       // if ()
@@ -66,7 +74,7 @@ export default function AutoSave (props: AutoSaveProps) {
       //   callback: (_twcss:string) => { body.twcss = _twcss; },
       // });
       try {
-        const response = await fetch("/api/" + _type, {
+        const response = await fetch("/api/page", {
           method: HttpMethod.PUT,
           headers: {
             "Content-Type": "application/json",
@@ -114,7 +122,7 @@ export default function AutoSave (props: AutoSaveProps) {
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
-    if (data?.title && data.description && !publishing)
+    if (data?.title && !publishing)
       setDisabled(false);
     else setDisabled(true);
   }, [publishing, data]);
@@ -136,32 +144,39 @@ export default function AutoSave (props: AutoSaveProps) {
   async function publish(_data:typeof data, _builder:typeof builder, _editor:typeof editor) {
     setPublishing(true);
     try {
-      const body = {
+      let body = {
         id: _data?.id,
-        title: _data?.title,
-        description: _data?.description,
-        previewData: _data?.previewData,
-        preview: _data?.preview,
-        data: _data?.data,
-        content: _data?.content,
-        published: true,
+        type: _data?.type || _type,
+        slug: _data?.slug,
         subdomain: _data?.site?.subdomain,
         customDomain: _data?.site?.customDomain,
-        slug: _data?.slug,
+        title: _data?.title,
+        description: _data?.description,
+        published: true,
       }
       switch (_type) { 
         case "post" :
-          body.content = _editor && _editor?.getData() || _data?.content
-          body.preview = _editor && _editor?.getData() || _data?.content
+          body = {
+            ...body,
+            ... {
+              content : _editor && _editor?.getData() || _data?.content,
+              preview : _editor && _editor?.getData() || _data?.content,
+            }
+          }
           break;
         case "page" :
-          body.data = _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data
-          body.content = _builder && _builder?.getHtml() || _data?.content
-          body.previewData = _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data
-          body.preview = _builder && _builder?.getHtml() || _data?.content
+          body = {
+            ...body,
+            ... {
+              data : _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data,
+              content : _builder && _builder?.getHtml() || _data?.content,
+              previewData : _builder && JSON.stringify(_builder?.getProjectData()) || _data?.data,
+              preview : _builder && _builder?.getHtml() || _data?.content
+            }
+          }
           break;
       }
-      const response = await fetch(`/api/` + _type, {
+      const response = await fetch(`/api/page`, {
         method: HttpMethod.PUT,
         headers: {
           "Content-Type": "application/json",
@@ -208,7 +223,7 @@ export default function AutoSave (props: AutoSaveProps) {
             }}
             title={
               disabled
-                ? "Page must have a title, description, and content to be published."
+                ? "Page must have a title, and content to be published."
                 : "Publish"
             }
             disabled={disabled}

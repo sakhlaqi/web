@@ -214,6 +214,7 @@ export async function updatePost(
 ): Promise<void | NextApiResponse<Post>> {
   const {
     id,
+    type,
     title,
     description,
     content,
@@ -234,6 +235,7 @@ export async function updatePost(
         id: id,
       },
       data: {
+        type,
         title,
         description,
         content,

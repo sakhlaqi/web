@@ -1,16 +1,19 @@
 
+import { useState, useEffect } from "react";
 import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
+import {useSelector, useDispatch} from 'react-redux';
 
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { _getStaticPaths, _getStaticProps } from '../../../../../utils/posts'
+import { _getStaticPaths, _getStaticProps } from '../../../../../utils/pages'
 import type { ParsedUrlQuery } from "querystring";
 import { useRouter } from "next/router";
-import type { Meta } from "@/types";
+import type { AdjacentPage, Meta } from "@/types";
 
 interface PathProps extends ParsedUrlQuery {
   site: string;
   slug: string;
+  type: string;
 }
 
 
@@ -24,6 +27,13 @@ export default function Post({
 }: DataProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
+
+  // const data = JSON.parse(stringifiedData) as _SiteSlugData & {
+  //   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
+  // };
+  // const adjacentPages = JSON.parse(
+  //   stringifiedAdjacentPage
+  // ) as Array<AdjacentPage>;
 
   const meta = {
     description: data.description,

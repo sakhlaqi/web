@@ -26,11 +26,12 @@ export async function getPage(
   res: NextApiResponse,
   session: Session
 ): Promise<void | NextApiResponse<AllPages | (WithSitePage | null)>> {
-  const { pageId, siteId, published } = req.query;
+  const { pageId, siteId, type, published } = req.query;
 
   if (
     Array.isArray(pageId) ||
     Array.isArray(siteId) ||
+    Array.isArray(type) ||
     Array.isArray(published)
   )
     return res.status(400).end("Bad request. Query parameters are not valid.");
@@ -66,13 +67,14 @@ export async function getPage(
       },
     });
 
-    const pages = !site
+    const data = !site
       ? []
       : await prisma.page.findMany({
           where: {
             site: {
               id: siteId,
             },
+            type: type,
             published: JSON.parse(published || "true"),
           },
           orderBy: {
@@ -81,7 +83,7 @@ export async function getPage(
         });
 
     return res.status(200).json({
-      pages,
+      data,
       site,
     });
   } catch (error) {
@@ -106,9 +108,9 @@ export async function createPage(
 ): Promise<void | NextApiResponse<{
   pageId: string;
 }>> {
-  const { siteId } = req.query;
+  const { siteId, type } = req.query;
 
-  if (Array.isArray(siteId))
+  if (Array.isArray(siteId) || Array.isArray(type) )
     return res
       .status(400)
       .end("Bad request. siteId parameter cannot be an array.");
@@ -121,6 +123,7 @@ export async function createPage(
             id: siteId,
           },
         },
+        type: type,
       },
     });
 
@@ -169,7 +172,7 @@ export async function deletePage(
       await revalidate(
         `https://${response.site?.subdomain}.${process.env.ROOT_DOMAIN}`, // hostname to be revalidated
         response.site.subdomain, // siteId
-        response.slug // slugname for the page
+        response.slug, // slugname for the page
       );
     }
     if (response?.site?.customDomain)
@@ -177,7 +180,7 @@ export async function deletePage(
       await revalidate(
         `https://${response.site.customDomain}`, // hostname to be revalidated
         response.site.customDomain, // siteId
-        response.slug // slugname for the page
+        response.slug, // slugname for the page
       );
 
     return res.status(200).end();
@@ -208,57 +211,36 @@ export async function updatePage(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse<Page>> {
-  const {
+  const { 
     id,
-    title,
-    description,
-    content,
-    data,
-    preview,
-    previewData,
     slug,
-    image,
-    imageBlurhash,
-    published,
-    publishedAt,
+    type,
     subdomain,
     customDomain,
   } = req.body;
 
-  let _update_data = {
-    title,
-    description,
-    slug,
-    preview,
-    previewData,
-  }
-  if ( published ) {
-    _update_data = {
-      ..._update_data, 
-      ...{
-        content,
-        data,
-        published,
-        publishedAt,
-      }
-    }
-  }
+  delete req.body.id;
+  delete req.body.subdomain;
+  delete req.body.customDomain;
 
   try {
     const page = await prisma.page.update({
       where: {
         id: id,
       },
-      data: _update_data,
+      data: req.body,
     });
-    const fs = require('fs');
-    fs.writeFileSync('./templates/' + id + (!req.body.published ? '-preview.html' : '.html'), req.body.published ? content : preview);
+    if (type === 'page') {
+      const fs = require('fs');
+      fs.writeFileSync('./templates/' + id + (!req.body.published ? '-preview.html' : '.html'), req.body.published ? req.body.content : req.body.preview);
+    }
     if (subdomain) {
       // revalidate for subdomain
       await revalidate(
         `http://${subdomain}.${process.env.ROOT_DOMAIN}`, // hostname to be revalidated
         subdomain, // siteId
-        slug // slugname for the page
+        slug, // slugname for the page,
+        type
       );
     }
     if (customDomain)
@@ -266,7 +248,8 @@ export async function updatePage(
       await revalidate(
         `http://${customDomain}`, // hostname to be revalidated
         customDomain, // siteId
-        slug // slugname for the page
+        slug, // slugname for the page
+        type
       );
     return res.status(200).json(page);
   } catch (error) {

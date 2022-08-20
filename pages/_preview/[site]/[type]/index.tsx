@@ -1,29 +1,52 @@
+import remarkMdx from "remark-mdx";
+import { MDXRemote } from "next-mdx-remote";
+import { remark } from "remark";
+import { serialize } from "next-mdx-remote/serialize";
+import { useRouter } from "next/router";
 
-import { useState, useEffect } from "react";
+import BlogCard from "@/components/BlogCard";
+import BlurImage from "@/components/BlurImage";
+import Date from "@/components/Date";
+import Examples from "@/components/mdx/Examples";
 import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
-import {useSelector, useDispatch} from 'react-redux';
+import prisma from "@/lib/prisma";
+import Tweet from "@/components/mdx/Tweet";
 
+
+import {
+  replaceExamples,
+  replaceLinks,
+  replaceTweets,
+} from "@/lib/remark-plugins";
+
+import type { AdjacentPage, Meta, _SiteSlugData } from "@/types";
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { _getStaticPaths, _getStaticProps } from '../../../../../utils/posts'
+import { _getStaticPaths, _getStaticProps } from '../../../../utils/pages'
+import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import type { ParsedUrlQuery } from "querystring";
-import { useRouter } from "next/router";
-import type { AdjacentPage, Meta } from "@/types";
+
+const components = {
+  a: replaceLinks,
+  BlurImage,
+  Examples,
+  Tweet,
+};
 
 interface PathProps extends ParsedUrlQuery {
   site: string;
   slug: string;
+  type: string;
 }
 
-
-import type { WithSitePost } from "@/types";
-interface DataProps {
-  data: WithSitePost;
+import type { WithSitePage } from "@/types";
+interface PageProps {
+  data: WithSitePage;
 }
 
-export default function Post({
+export default function Page({
   data,
-}: DataProps) {
+}: PageProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
 
@@ -43,7 +66,7 @@ export default function Post({
   } as Meta;
   return (
     <Layout meta={meta} subdomain={data.site?.subdomain ?? undefined}>
-      <div dangerouslySetInnerHTML={{ __html: data.content || '' }} />
+      <div dangerouslySetInnerHTML={{ __html: data.preview || '' }} />
     </Layout>
   );
 }
@@ -52,7 +75,7 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
   return await _getStaticPaths();
 };
 
-export const getStaticProps: GetStaticProps<DataProps, PathProps> = async ({
+export const getStaticProps: GetStaticProps<PageProps, PathProps> = async ({
   params
 }) => {
   const data = await _getStaticProps(params)
@@ -63,4 +86,3 @@ export const getStaticProps: GetStaticProps<DataProps, PathProps> = async ({
     revalidate: 3600,
   };
 };
-

@@ -12,7 +12,8 @@ export default function AddNew() {
 
     async function create(siteId: string) {
         try {
-            const res = await fetch(`/api/${_type}?siteId=${siteId}`, {
+            // const res = await fetch(`/api/${_type}?siteId=${siteId}`, {
+            const res = await fetch(`/api/page?siteId=${siteId}&type=${_type}`, {
             method: HttpMethod.POST,
             headers: {
                 "Content-Type": "application/json",
