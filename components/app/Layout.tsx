@@ -165,15 +165,6 @@ export default function Layout({ siteId, children }: LayoutProps) {
                     Posts
                   </span>
                 </Link>
-                {/* <Link href={`/site/${router.query.id}/drafts`} passHref>
-                  <span
-                    className={`border-b-2 ${
-                      tab == "drafts" ? "border-black" : "border-transparent"
-                    } py-3`}
-                  >
-                    Drafts
-                  </span>
-                </Link> */}
                 <Link href={`/site/${router.query.id}/settings`} passHref>
                   <span
                     className={`cursor-pointer border-b-2 ${

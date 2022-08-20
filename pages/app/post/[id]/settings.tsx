@@ -14,7 +14,7 @@ import { HttpMethod } from "@/types";
 
 import type { ChangeEvent } from "react";
 
-import type { WithSitePost } from "@/types";
+import type { WithSitePage } from "@/types";
 
 interface SettingsData {
   slug: string;
@@ -27,10 +27,10 @@ export default function PostSettings() {
   const router = useRouter();
 
   // TODO: Undefined check redirects to error
-  const { id: postId } = router.query;
+  const { id: pageId } = router.query;
 
-  const { data: settings, isValidating } = useSWR<WithSitePost>(
-    `/api/post?postId=${postId}`,
+  const { data: settings, isValidating } = useSWR<WithSitePage>(
+    `/api/page?pageId=${pageId}&type=post`,
     fetcher,
     {
       onError: () => router.push("/"),
@@ -63,14 +63,15 @@ export default function PostSettings() {
     setSaving(true);
 
     try {
-      const response = await fetch("/api/post", {
+      const response = await fetch("/api/page", {
         method: HttpMethod.PUT,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: postId,
+          id: pageId,
           slug: data.slug,
+          type:'post',
           image: data.image,
           imageBlurhash: data.imageBlurhash,
           subdomain: settings?.site?.subdomain,
@@ -86,10 +87,10 @@ export default function PostSettings() {
     }
   }
 
-  async function deletePost(postId: string) {
+  async function deletePost(pageId: string) {
     setDeletingPost(true);
     try {
-      const response = await fetch(`/api/post?postId=${postId}`, {
+      const response = await fetch(`/api/page?pageId=${pageId}`, {
         method: HttpMethod.DELETE,
       });
 
@@ -201,7 +202,7 @@ export default function PostSettings() {
           <form
             onSubmit={async (event) => {
               event.preventDefault();
-              await deletePost(postId as string);
+              await deletePost(pageId as string);
             }}
             className="inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white shadow-xl rounded-lg"
           >

@@ -8,10 +8,9 @@ import {State} from '../../store';
 import {useSelector} from 'react-redux';
 import { useRouter } from "next/router";
 
-import type { WithSitePost, WithSitePage } from "@/types";
+import type { WithSitePage } from "@/types";
 interface AutoSaveProps {
   page? : WithSitePage,
-  post? : WithSitePost,
 }
 
 export default function AutoSave (props: AutoSaveProps) {

@@ -16,12 +16,12 @@ interface PathProps extends ParsedUrlQuery {
 }
 
 
-import type { WithSitePost } from "@/types";
+import type { WithSitePage } from "@/types";
 interface DataProps {
-  data: WithSitePost;
+  data: WithSitePage;
 }
 
-export default function Post({
+export default function Page({
   data,
 }: DataProps) {
   const router = useRouter();

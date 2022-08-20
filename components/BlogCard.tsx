@@ -2,11 +2,11 @@ import Link from "next/link";
 import BlurImage from "./BlurImage";
 import Date from "./Date";
 
-import type { Post } from "@prisma/client";
+import type { Page } from "@prisma/client";
 
 interface BlogCardProps {
   data: Pick<
-    Post,
+    Page,
     "slug" | "image" | "imageBlurhash" | "title" | "description" | "createdAt"
   >;
 }

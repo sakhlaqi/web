@@ -6,14 +6,14 @@ import {createWrapper, Context, HYDRATE} from 'next-redux-wrapper';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 
-import type { WithSitePage, WithSitePost, } from "@/types";
+import type { WithSitePage } from "@/types";
 import type { Site } from "@prisma/client";
 import GrapesJS from 'grapesjs';
 
 export interface State {
   site: Site|null;
   page: WithSitePage|null;
-  post: WithSitePost|null;
+  post: WithSitePage|null;
   editor: any | null;
   builder: GrapesJS.Editor | null;
 }
