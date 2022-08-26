@@ -50,13 +50,13 @@ model Example {
 }
 
 model Page {
-  id          String   @id
+  id          String   @id @default(cuid())
   title       String?  @db.Text
   description String?  @db.Text
   content     String?  @db.LongText
-  slug        String
+  slug        String   @default(cuid())
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime @updatedAt
   published   Boolean  @default(false)
   siteId      String?
   data        String?  @db.LongText
