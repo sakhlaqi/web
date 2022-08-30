@@ -7,6 +7,7 @@ import LoadingDots from "@/components/app/loading-dots";
 
 interface RowsProps {
     id: string
+    type?: string
     title?: string | null
     name?: string | null
     description?: string | null
@@ -32,7 +33,8 @@ export default function Rows() {
 
     const { data } = useSWR<any>(
         // siteId && `/api/${_type}?siteId=${siteId}&published=true`,
-        siteId && `/api/page?siteId=${siteId}&type=${_type}&published=true`,
+        // siteId && `/api/page?siteId=${siteId}&type=${_type}&published=true`,
+        siteId && `/api/page?siteId=${siteId}&type=${_type}`,
         fetcher,
         {
             onSuccess: (data) => !data?.site && router.push("/"),
@@ -44,14 +46,14 @@ export default function Rows() {
             {data && data.data ? (
                 data.data.length > 0 ? (
                 data.data.map((item:RowsProps) => (
-                    <div key={item.id} className="flex bg-white items-center hover:bg-sky-50 cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200">
+                    <div key={item.id} className={`flex ${item.published ?'bg-white hover:bg-amber-100' : 'bg-slate-100 opacity-50 hover:bg-white hover:opacity-100'} items-center cursor-pointer align-items-center flex-row overflow-hidden border-b border-gray border-gray-200`}>
                     <Link href={`/${_type}/${item.id}`} >
-                        <div className="font-cal bold flex-1 px-2 my-2" >
-                        {item.title || item.name || "Untitled"}
+                        <div className="font-cal flex-1 px-2 my-2" >
+                        {item.title || item.name || item.slug || "Untitled"}
                         </div>
                     </Link>
                     <a className="font-cal px-3 my-2 tracking-wide bg-slate-50 text-gray-600 text-gray-400 whitespace-nowrap"
-                        href={`http://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${_type != 'page' ?  _type + '/' : ''}${item.slug}`}
+                        href={`http://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${_type != 'page' ?  _type + '/' : ''}${item.slug != 'home' ? item.slug : ''}`}
                         rel="noreferrer" target="_blank"
                     >
                         .../{item.slug} ↗

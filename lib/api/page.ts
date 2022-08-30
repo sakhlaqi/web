@@ -75,11 +75,12 @@ export async function getPage(
               id: siteId,
             },
             type: type,
-            published: JSON.parse(published || "true"),
+            // published: JSON.parse(published || "true"),
           },
-          orderBy: {
-            createdAt: "desc",
-          },
+          orderBy: [
+            {published: "desc"},
+            {createdAt: "desc"},
+          ],
         });
 
     return res.status(200).json({

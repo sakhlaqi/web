@@ -10,7 +10,6 @@ import Date from "@/components/Date";
 import Examples from "@/components/mdx/Examples";
 import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
-import prisma from "@/lib/prisma";
 import Tweet from "@/components/mdx/Tweet";
 
 

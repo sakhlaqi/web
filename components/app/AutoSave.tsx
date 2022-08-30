@@ -121,7 +121,7 @@ export default function AutoSave (props: AutoSaveProps) {
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
-    if (data?.title && !publishing)
+    if (data?.slug && !publishing)
       setDisabled(false);
     else setDisabled(true);
   }, [publishing, data]);

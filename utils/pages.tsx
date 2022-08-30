@@ -68,10 +68,10 @@ export const _getStaticProps = async (
     params:PathProps|undefined
   ) => {
     if (!params) throw new Error("No path parameters found");
-  
+    
     const { site } = params;
 
-    const slug = params.type && ! params.slug ? params.type : params.slug
+    const slug = (params.type && ! params.slug ? params.type : params.slug) || 'home';
     const type = params.slug && params.type || undefined
   
     let filter: {
