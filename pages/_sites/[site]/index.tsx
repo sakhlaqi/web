@@ -5,6 +5,7 @@ import type { Meta, _SiteSlugData } from "@/types";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import { _getStaticPaths, _getStaticProps } from '../../../utils/pages'
 import type { ParsedUrlQuery } from "querystring";
+import useLink from "../../../utils/link";
 
 interface PathProps extends ParsedUrlQuery {
   site: string;
@@ -22,6 +23,8 @@ export default function Page({
 }: PageProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
+
+  useLink()
 
   const meta = {
     description: data.description,

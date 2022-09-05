@@ -196,7 +196,7 @@ export default function AutoSave (props: AutoSaveProps) {
   }
     return (
       <>
-        <div className="font-cal flex items-center space-x-2 text-gray-700 pl-5 sm:hover:text-black sm:hover:bg-white">
+        <div className="font-cal flex items-center text-gray-700 pl-5 sm:hover:text-black sm:hover:bg-white">
           <button
             onClick={async () => {
               await triggerSave();
@@ -211,10 +211,17 @@ export default function AutoSave (props: AutoSaveProps) {
               disabled
                 ? "cursor-not-allowed bg-gray-300 border-gray-300"
                 : "bg-gray-200 text-black hover:bg-[#333] hover:text-white border-black"
-            } inline-flex items-center px-4 py-2 rounded-md shadow-sm text-medium font-thin focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
+            } inline-flex items-center px-4 py-2 shadow-sm text-medium font-thin focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
           >
             <SaveIcon className="-ml-1 mr-2 h-5 w-5" /> {saveState}
           </button>
+
+          <a href={`http://${data.site?.subdomain}.${process.env.ROOT_DOMAIN}/${_type != 'page' ?  _type + '/' : ''}${data?.slug != 'home' ? data?.slug : ''}`}
+            rel="noreferrer" target="_blank"
+            className={`bg-gray-200 text-black hover:bg-[#333] hover:text-white inline-flex items-center px-4 py-2 border-l border-r border-gray-50  shadow-sm text-medium font-thin focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500`}
+          >
+            Preview ↗
+          </a>
 
           <button
             onClick={async () => {
@@ -230,7 +237,7 @@ export default function AutoSave (props: AutoSaveProps) {
               disabled
                 ? "cursor-not-allowed bg-gray-300 border-gray-300"
                 : "bg-green-700 hover:bg-green-600 hover:text-white border-black"
-            } inline-flex items-center px-4 py-2 rounded-md shadow-sm text-medium font-thin text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+            } inline-flex items-center px-4 py-2 shadow-sm text-medium font-thin text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
           >
             {!publishing && data?.published &&
               <CheckIcon className="-ml-1 mr-2 h-5 w-5" />

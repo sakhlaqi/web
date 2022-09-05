@@ -11,6 +11,7 @@ import Examples from "@/components/mdx/Examples";
 import Layout from "@/components/sites/Layout";
 import Loader from "@/components/sites/Loader";
 import Tweet from "@/components/mdx/Tweet";
+import useLink from "../../../../utils/link";
 
 
 import {
@@ -48,6 +49,8 @@ export default function Page({
 }: PageProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
+  
+  useLink()
 
   // const data = JSON.parse(stringifiedData) as _SiteSlugData & {
   //   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;

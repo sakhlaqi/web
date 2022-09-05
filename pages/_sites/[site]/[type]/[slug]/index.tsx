@@ -8,6 +8,7 @@ import { _getStaticPaths, _getStaticProps } from '../../../../../utils/pages'
 import type { ParsedUrlQuery } from "querystring";
 import { useRouter } from "next/router";
 import type { AdjacentPage, Meta } from "@/types";
+import useLink from "../../../../../utils/link";
 
 interface PathProps extends ParsedUrlQuery {
   site: string;
@@ -26,6 +27,8 @@ export default function Page({
 }: DataProps) {
   const router = useRouter();
   if (router.isFallback) return <Loader />;
+
+  useLink()
 
   // const data = JSON.parse(stringifiedData) as _SiteSlugData & {
   //   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
